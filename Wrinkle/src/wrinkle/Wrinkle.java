@@ -15,7 +15,7 @@ import java.awt.Graphics2D;
 
 import javax.sound.sampled.*;
 import java.io.File;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 
@@ -24,12 +24,15 @@ import javax.imageio.ImageIO;
  *
  * @author a.bresee
  */
-class Wrinkle extends Actor{
+final class Wrinkle extends Actor{
     
     
     int frametime=5;
     int timecount=0;
     int frame=0;
+
+    //private int normalheight;
+    //private int normalwidth;
 
     boolean onTheGround;
     boolean goingRight;
@@ -64,8 +67,11 @@ class Wrinkle extends Actor{
         
         initSounds(); 
         initImages();
-                    
+
         cursprite=rightidle;
+
+        //normalheight=cursprite.getHeight();
+        //normalwidth=cursprite.getWidth();
     }
     
     //called by ctor to init position, velocity, and acceleration
@@ -244,7 +250,7 @@ class Wrinkle extends Actor{
         velY+=accelY*Global.timeStep;     
     }
           
-    void update(Vector<Terrain> terrains)
+    void update(ArrayList<Terrain> terrains)
     {
         
         updateVel();       
@@ -328,8 +334,7 @@ class Wrinkle extends Actor{
                 }
                 else
                 {
-                    playClip(walk2);
-                    
+                    playClip(walk2);                    
                 }
                 cursprite=(facingLeft)?leftwalk[frame]:rightwalk[frame]; 
                 
@@ -345,13 +350,33 @@ class Wrinkle extends Actor{
         {
             cursprite=(facingLeft)?leftidle:rightidle;
         }
-       //System.out.println("x: "+x+"\ny: "+y);
-       //System.out.println("velX:"+velX+"\nvelY: "+velY);
+        correctOffsets();
+    }
+    void correctOffsets()
+    {
+       if(x-Global.OffsetX>(Global.WinX/2))
+        {
+            Global.OffsetX=x-Global.WinX/2;
+        }
+        else if(x - Global.OffsetX < (Global.WinX / 4))
+        {
+            Global.OffsetX=x-Global.WinX/4;
+        }
+        if(y-Global.OffsetY<(Global.WinY/2))
+        {
+            Global.OffsetY=y-Global.WinY/2;
+        }
+        else if((y-Global.OffsetY+cursprite.getHeight())>Global.WinY-50)
+        {
+            Global.OffsetY=(y+cursprite.getHeight())-(Global.WinY-50);
+        }
     }
     
     void draw(Graphics2D g)
     {
-        g.drawImage(cursprite,(int)Math.round(x),(int)Math.round(y),null);
+        g.drawImage(cursprite,Math.round(x-Global.OffsetX)
+                             ,Math.round(y-Global.OffsetY)
+                             ,null);
     }
     int getHeight(){return cursprite.getHeight();}
     int getWidth(){return cursprite.getWidth();}

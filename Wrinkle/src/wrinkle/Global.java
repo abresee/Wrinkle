@@ -22,6 +22,10 @@ class Global{
     static final int WinY=600;
     static final int framecount=2;
     static final float gravity=0.005f;
+    static final float[] coeff={0.125f,0.25f,0.5f};
+    static float OffsetX=0;
+    static float OffsetY=0;
+
     static Clip makeClip (String str) throws Exception
     {
         try

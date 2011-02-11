@@ -34,7 +34,7 @@ class Terrain extends Collidable
    {
        g.setColor(color); 
        g.setStroke(new BasicStroke(5));
-       g.fillRect((int)x,(int)y,width,height);     
+       g.fillRect(Math.round(x-Global.OffsetX),Math.round(y-Global.OffsetY),width,height);
    }
    Terrain()
    {
