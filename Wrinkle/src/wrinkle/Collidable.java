@@ -37,7 +37,6 @@ abstract class Collidable
         c.generateBoundingBox();
         boolean b=bBox.intersects(c.getbBox());
         return b;
-        
     }
             
 }

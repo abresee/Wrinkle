@@ -11,15 +11,17 @@
 package wrinkle;
 
 import java.awt.*;
-
 import javax.swing.JPanel;
 import java.awt.image.BufferedImage;
+import java.awt.geom.AffineTransform;
 import java.awt.event.*;
 //import java.awt.geom.*;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.util.ArrayList;
+
+
 
 
 
@@ -32,16 +34,12 @@ import java.io.File;
 
 class Game extends JPanel implements KeyListener {
 
-
     Wrinkle wrinkle;
-    ArrayList<Terrain> terrains;
+
+    GameObjects go;
 
     BufferedImage[] backgrounds;
-    
-    BufferedImage fgcanvas;
-    BufferedImage bgcanvas1;
-    BufferedImage bgcanvas2;
-    BufferedImage bgcanvas3;
+        
     BufferedImage buff;
 
     boolean bg1changed;
@@ -50,12 +48,10 @@ class Game extends JPanel implements KeyListener {
 
     boolean running;
 
-    Graphics2D fg;
-    Graphics2D bg1;
-    Graphics2D bg2;
-    Graphics2D bg3;
     Graphics2D buffg;
     Graphics2D panel;
+
+    AffineTransform at;
 
     public Game()
     {
@@ -63,7 +59,9 @@ class Game extends JPanel implements KeyListener {
         addKeyListener(this);
         setFocusable(true);
 
-        terrains=new ArrayList<Terrain>();
+        at=new AffineTransform();
+
+        go=new GameObjects();
 
         String prefix="Data/Images/background/";
         backgrounds=new BufferedImage[3];
@@ -78,38 +76,25 @@ class Game extends JPanel implements KeyListener {
             e.printStackTrace();
         }
 
-        //fgcanvas  = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
-        //bgcanvas1 = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
-        //bgcanvas2 = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
-        //bgcanvas3 = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
+       
         buff        = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
-
-        //fg          = (Graphics2D)fgcanvas.createGraphics();
-        //bg1         = (Graphics2D)bgcanvas1.createGraphics();
-        //bg2         = (Graphics2D)bgcanvas2.createGraphics();
-        //bg3         = (Graphics2D)bgcanvas3.createGraphics();
         buffg       = (Graphics2D)buff.createGraphics();
-        //panel       = (Graphics2D)this.getGraphics();
-
-        //bg1changed=false;
-        //bg2changed=false;
-        //bg3changed=false;
 
         running=true;
 
         wrinkle=new Wrinkle(Global.WinX/4+1,Global.WinY-200);
 
-        terrains.add(new Terrain(0,Global.WinY-200+wrinkle.getHeight(),
+        go.add(new Terrain(0,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
-        terrains.add(new Terrain(500,Global.WinY-200+wrinkle.getHeight(),
+        go.add(new Terrain(500,Global.WinY-200+wrinkle.getHeight(),
                             300,400,Color.RED));
-        terrains.add(new Terrain(300,400,100,100));
-        terrains.add(new Terrain(200,200,50,50));
-        terrains.add(new Terrain(Global.WinX,Global.WinY-200+wrinkle.getHeight(),
+        go.add(new Terrain(300,400,100,100));
+        go.add(new Terrain(200,200,50,50));
+        go.add(new Terrain(Global.WinX,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.MAGENTA));
-        terrains.add(new Terrain(1200,Global.WinY-200+wrinkle.getHeight(),
+        go.add(new Terrain(1200,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
-        terrains.add(new Terrain(1800,Global.WinY-200+wrinkle.getHeight(),
+        go.add(new Terrain(1800,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
     }
 
@@ -130,13 +115,10 @@ class Game extends JPanel implements KeyListener {
             case KeyEvent.VK_RIGHT:
                 wrinkle.goRight();
                 break;
-
             case KeyEvent.VK_LEFT:
                 wrinkle.goLeft();
                 break;
-
         }
-
     }
 
     public void keyReleased(KeyEvent e)
@@ -155,12 +137,7 @@ class Game extends JPanel implements KeyListener {
 
     void drawToForeground()
     {
-
-       
-//        fg.setStroke(new BasicStroke(5));
-//        fg.setColor(Color.CYAN);
-//        fg.fillRect(0,0,Global.WinX,Global.WinY);
-        
+        ArrayList<Terrain> terrains=go.getTerrains();
         for(int i=0;i<terrains.size();++i)
         {
             terrains.get(i).draw(buffg);
@@ -168,36 +145,32 @@ class Game extends JPanel implements KeyListener {
         wrinkle.draw(buffg);
 
     }
+    
+
     void drawBackground()
     {
+        buffg.setBackground(Color.cyan);
         buffg.clearRect(0,0,Global.WinX,Global.WinY);
+        
         for(int i=0;i<backgrounds.length;++i)
         {
-           int x=(Math.round(-Global.coeff[i]*Global.OffsetX))%Global.WinX;
-           int y=(Math.round(-Global.coeff[i]*Global.OffsetY));
+           float x=-(Global.coeff[i]*Global.OffsetX)%Global.WinX;
+           float y=-(Global.coeff[i]*Global.OffsetY);
            
 
            if(x>=0)
            {
                x=x-Global.WinX;
            }
-           if(i==1)
-            {
-            System.out.println(i+"'s x is: "+x);
-            }
-           buffg.drawImage(backgrounds[i],x,y,this);
+           at.setToTranslation(x,y);
+           buffg.setTransform(at);
+           buffg.drawImage(backgrounds[i],0,0,this);
         }
+        at.setToIdentity();
+        buffg.setTransform(at);       
 
-        
     }
-    
-//    void drawToBuff()
-//    {
-//        buffg.drawImage(bgcanvas3,0,0, this);
-//        buffg.drawImage(bgcanvas2,0,0, this);
-//        buffg.drawImage(bgcanvas1,0,0, this);
-//        buffg.drawImage(fgcanvas,0,0, this);
-//    }
+
 
     @Override
     public void paint(Graphics g)
@@ -208,16 +181,15 @@ class Game extends JPanel implements KeyListener {
     void go()
     {
 
-    wrinkle.update(terrains);
+    wrinkle.update(go);
     drawBackground();
     drawToForeground();
-    //drawToBuff();
     panel=(Graphics2D)this.getGraphics();
     panel.drawImage(buff,0,0, this);
     }
     void loop()
     {
-
+        System.out.println("game start");
        while(running)
        {
             long time=System.currentTimeMillis();
@@ -225,6 +197,7 @@ class Game extends JPanel implements KeyListener {
             go();
             
             time=System.currentTimeMillis()-time;
+            System.out.println(time);
             if(time<Global.timeStep)
             {
                 try

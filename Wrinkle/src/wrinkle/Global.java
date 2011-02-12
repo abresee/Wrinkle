@@ -17,11 +17,11 @@ import java.io.File;
  * @author a.bresee
  */
 class Global{
-    static final int timeStep=16;
+    static final int timeStep=17;
     static final int WinX=800;
     static final int WinY=600;
     static final int framecount=2;
-    static final float gravity=0.005f;
+    static final float gravity=0.0035f;
     static final float[] coeff={0.125f,0.25f,0.5f};
     static float OffsetX=0;
     static float OffsetY=0;

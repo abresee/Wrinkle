@@ -14,7 +14,6 @@ package wrinkle;
  * @author a.bresee
  */
 
-import java.awt.Graphics2D;
 import java.awt.geom.*;
 import java.awt.*;
 
