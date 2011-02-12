@@ -12,23 +12,29 @@ import javax.sound.sampled.*;
 import java.util.ArrayList;
 
 /**
- *
+ * Class that defines the player character
  * @author a.bresee
  */
-final class Wrinkle extends Actor {
+public final class Wrinkle extends Actor {
 
+    /**
+     *Enum to flag what 'copy mode' wrinkle is using
+     *@author a.bresee
+     */
     enum Mode{normal,bird,dragon};
     Mode m;
 
-    ///////////////////////
-    //INITIALIZATION CODE//
-    ///////////////////////    
-    //default ctor calls parametered ctor//    
+    
+    /**
+     *Default ctor calls parameterized ctor
+     */
     Wrinkle() {
         this(0, 0);
     }
 
-    //parametered ctor takes pixel coords on where top left corner should be//
+    /**
+     * parametered ctor takes pixel coords on where top left corner should be
+     */
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
         mass = 1;
@@ -36,7 +42,9 @@ final class Wrinkle extends Actor {
         m=Mode.normal;
     }
 
-    //called by ctor to init position, velocity, and acceleration
+    /**
+     *Defines behavior of "jump" action. Called when player jumps.
+     */
     void jump() {
         if (onTheGround) {
             playClip(jumpsnd);
@@ -46,7 +54,10 @@ final class Wrinkle extends Actor {
             curSprite = (facingLeft) ? leftJump : rightJump;
         }
     }
-
+    /**
+     *Defines behavior of "right" action. Called when player presses the 
+     *"right" key.
+     */
     void goRight()
     {
         if (!goingRight)
@@ -59,12 +70,19 @@ final class Wrinkle extends Actor {
             goingLeft = false;
         }
     }
-
+    /**
+     *Cleans up after the "right" action. Called when player releases the 
+     *"right" key.
+     */
     void unGoRight()
     {
         goingRight = false;
     }
 
+    /**
+     *Defines behavior of "left" action. Called when player presses the 
+     *"left" key.
+     */
     void goLeft()
     {
         if (!goingLeft) {
@@ -77,11 +95,21 @@ final class Wrinkle extends Actor {
         }
     }
 
+    /**
+     *Cleans up after the "left" action. Called when player releases the 
+     *"left" key.
+     */
     void unGoLeft()
     {
         goingLeft = false;
     }
-
+    
+    /**
+     *Plays the sound file contained in the clip param. if <code>soundImplemented 
+     *</code> is false, nothing happens. This is to prevent errors on systems without
+     *sound
+     *@param Clip is a well-formed clip, loaded with data
+     */
     void playClip(Clip clip)
     {
         if (soundImplemented)

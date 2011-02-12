@@ -13,10 +13,10 @@ import java.awt.geom.*;
 import java.awt.Graphics2D;
 
 /**
- *
+ * Abstract superclass of anything that can collide with anything else
  * @author a.bresee
  */
-abstract class Collidable
+public abstract class Collidable
 {
     float x;
     float y;

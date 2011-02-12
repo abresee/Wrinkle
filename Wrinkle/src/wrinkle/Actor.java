@@ -17,10 +17,11 @@ import javax.sound.sampled.*;
 import java.awt.Graphics2D;
 
 /**
- *
+ * Abstract superclass of game actors -- that is, objects that have animations,
+ * sounds, etc. 
  * @author a.bresee
  */
-abstract class Actor extends Collidable{    
+public abstract class Actor extends Collidable{    
     
     float velX;
     float velY;
@@ -149,10 +150,7 @@ abstract class Actor extends Collidable{
         return curSprite.getWidth();
 
     }
-    void draw(Graphics2D g) {
-        at.setToTranslation(-Global.OffsetX, -Global.OffsetY);
-        g.setTransform(at);
-        g.drawImage(curSprite, Math.round(x), Math.round(y), null);
-        at.setToIdentity();
+    void draw(Graphics2D g) {        
+        g.drawImage(curSprite, Math.round(x), Math.round(y), null);        
     }
 }

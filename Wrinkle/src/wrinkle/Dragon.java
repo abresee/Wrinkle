@@ -6,10 +6,10 @@
 package wrinkle;
 
 /**
- *
+ * Class defining the Dragon enemy
  * @author a.bresee
  */
-final class Dragon  extends Enemy{
+public final class Dragon  extends Enemy{
 
     Dragon()
     {

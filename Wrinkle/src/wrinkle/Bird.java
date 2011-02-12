@@ -4,11 +4,12 @@
  */
 
 package wrinkle;
+
 /**
- *
+ * Class defining the Bird enemy
  * @author a.bresee
  */
-final class Bird extends Enemy
+public final class Bird extends Enemy
 {
     Bird()
     {

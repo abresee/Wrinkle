@@ -7,6 +7,12 @@ package wrinkle;
 
 import javax.swing.JFrame;
 import java.awt.Insets;
+
+/**
+ *Class that initializes the Frame and serves as the entry point for the 
+ *program
+ *@author a.bresee
+ */
 public class Main {  
     
     public static void main(String[] args) {

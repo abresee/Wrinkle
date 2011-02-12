@@ -13,10 +13,10 @@ import java.io.File;
 
 
 /**
- *
+ * Class contains constants and functions that other classes might find handy
  * @author a.bresee
  */
-class Global{
+public class Global{
     static final int timeStep=17;
     static final int WinX=800;
     static final int WinY=600;

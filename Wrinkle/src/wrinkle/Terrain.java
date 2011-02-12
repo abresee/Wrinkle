@@ -8,17 +8,15 @@
  */
 
 package wrinkle;
-
-/**
- *
- * @author a.bresee
- */
-
 import java.awt.geom.*;
 import java.awt.*;
 
 
-class Terrain extends Collidable
+/**
+ * Class for the game world's terrain
+ * @author a.bresee
+ */
+public class Terrain extends Collidable
 {
    int width;
    int height;
@@ -33,7 +31,7 @@ class Terrain extends Collidable
    {
        g.setColor(color); 
        g.setStroke(new BasicStroke(5));
-       g.fillRect(Math.round(x-Global.OffsetX),Math.round(y-Global.OffsetY),width,height);
+       g.fillRect(Math.round(x),Math.round(y),width,height);
    }
    Terrain()
    {

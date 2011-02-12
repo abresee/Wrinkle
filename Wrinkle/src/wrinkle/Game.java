@@ -26,17 +26,17 @@ import java.util.ArrayList;
 
 
 /**
- *
+ * Class representing the actual game simulation itself. 
  * @author a.bresee
  */
 
 
 
-class Game extends JPanel implements KeyListener {
+public class Game extends JPanel implements KeyListener {
 
     Wrinkle wrinkle;
 
-    GameObjects go;
+    GameObjects gameObjects;
 
     BufferedImage[] backgrounds;
         
@@ -61,7 +61,7 @@ class Game extends JPanel implements KeyListener {
 
         at=new AffineTransform();
 
-        go=new GameObjects();
+        gameObjects=new GameObjects();
 
         String prefix="Data/Images/background/";
         backgrounds=new BufferedImage[3];
@@ -84,17 +84,17 @@ class Game extends JPanel implements KeyListener {
 
         wrinkle=new Wrinkle(Global.WinX/4+1,Global.WinY-200);
 
-        go.add(new Terrain(0,Global.WinY-200+wrinkle.getHeight(),
+        gameObjects.add(new Terrain(0,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
-        go.add(new Terrain(500,Global.WinY-200+wrinkle.getHeight(),
+        gameObjects.add(new Terrain(500,Global.WinY-200+wrinkle.getHeight(),
                             300,400,Color.RED));
-        go.add(new Terrain(300,400,100,100));
-        go.add(new Terrain(200,200,50,50));
-        go.add(new Terrain(Global.WinX,Global.WinY-200+wrinkle.getHeight(),
+        gameObjects.add(new Terrain(300,400,100,100));
+        gameObjects.add(new Terrain(200,200,50,50));
+        gameObjects.add(new Terrain(Global.WinX,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.MAGENTA));
-        go.add(new Terrain(1200,Global.WinY-200+wrinkle.getHeight(),
+        gameObjects.add(new Terrain(1200,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
-        go.add(new Terrain(1800,Global.WinY-200+wrinkle.getHeight(),
+        gameObjects.add(new Terrain(1800,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
     }
 
@@ -137,7 +137,9 @@ class Game extends JPanel implements KeyListener {
 
     void drawToForeground()
     {
-        ArrayList<Terrain> terrains=go.getTerrains();
+        ArrayList<Terrain> terrains=gameObjects.getTerrains();
+        at.setToTranslation(-Global.OffsetX,-Global.OffsetY);
+        buffg.setTransform(at);
         for(int i=0;i<terrains.size();++i)
         {
             terrains.get(i).draw(buffg);
@@ -170,18 +172,10 @@ class Game extends JPanel implements KeyListener {
         buffg.setTransform(at);       
 
     }
-
-
-    @Override
-    public void paint(Graphics g)
-    {
-        
-        //g.drawImage(buff, 0,0, this);
-    }
+    
     void go()
     {
-
-    wrinkle.update(go);
+    wrinkle.update(gameObjects);
     drawBackground();
     drawToForeground();
     panel=(Graphics2D)this.getGraphics();
