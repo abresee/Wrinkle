@@ -4,7 +4,9 @@
  */
 
 package wrinkle;
+
 import java.util.ArrayList;
+import java.awt.Graphics2D;
 /**
  *
  * @author a.bresee
@@ -38,5 +40,24 @@ class GameObjects
     ArrayList<Actor> getActors()
     {
         return actors;
+    }
+
+    void draw(Graphics2D g)
+    {
+        for(Terrain i:terrains)
+        {
+            i.draw(g);
+        }
+        for(Actor i:actors)
+        {
+            i.draw(g);
+        }
+    }
+    void update()
+    {
+        for(Actor i:actors)
+        {
+            i.update(this);
+        }
     }
 }

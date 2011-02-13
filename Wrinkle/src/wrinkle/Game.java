@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
 import java.awt.event.*;
-//import java.awt.geom.*;
 import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -96,6 +95,7 @@ public class Game extends JPanel implements KeyListener {
                             400,400,Color.GREEN));
         gameObjects.add(new Terrain(1800,Global.WinY-200+wrinkle.getHeight(),
                             400,400,Color.GREEN));
+        gameObjects.add(new Bird(600,0));
     }
 
     public void keyTyped(KeyEvent e)
@@ -137,13 +137,11 @@ public class Game extends JPanel implements KeyListener {
 
     void drawToForeground()
     {
-        ArrayList<Terrain> terrains=gameObjects.getTerrains();
         at.setToTranslation(-Global.OffsetX,-Global.OffsetY);
         buffg.setTransform(at);
-        for(int i=0;i<terrains.size();++i)
-        {
-            terrains.get(i).draw(buffg);
-        }
+        
+        gameObjects.draw(buffg);
+
         wrinkle.draw(buffg);
 
     }
@@ -175,7 +173,10 @@ public class Game extends JPanel implements KeyListener {
     
     void go()
     {
+    
+    gameObjects.update();    
     wrinkle.update(gameObjects);
+    
     drawBackground();
     drawToForeground();
     panel=(Graphics2D)this.getGraphics();
