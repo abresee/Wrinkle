@@ -32,12 +32,13 @@ public final class Bird extends Enemy
     {
         super.draw(g);
         System.out.println("bird drawn at x "+x+" y "+y);
+        System.out.println("velX: "+velX+"\n velY: "+velY);
     }
     @Override
     void updateVel()
     {
         velX=0;
-        velY+=accelY+Global.timeStep;
+        velY+=accelY*Global.timeStep;
          if (Math.abs(velY) > maxVelY) {
             velY = (velY < 0) ? -maxVelY : maxVelY;
         }

@@ -24,6 +24,9 @@ import java.util.ArrayList;
  */
 public abstract class Actor extends Collidable{    
 
+    /**
+     *Currently Unused enum to flag direction, to simplify collision code
+     */
     enum direction{x,y};
 
     float velX;
@@ -32,21 +35,44 @@ public abstract class Actor extends Collidable{
     float accelY;
     float maxVelX;
     float maxVelY;
+    
+    float delX;
+    float delY;
 
+    /**
+     *Currently unused - mass for calculating momentum changes in collisions
+     */
     float mass;
     
+    /**
+     *How many game-frames should go by before the next animation frame is loaded
+     */
     int frametime=5;
+    
+    /*
+     *Variable keeps track of game-frames since last animation frame change
+     */
+    
     int timecount=0;
+    
+    /**
+     *variable keeps track of what frame we're on in an animation sequence
+     */
     int frame=0;
 
+    
     boolean onTheGround;
     boolean goingRight;
     boolean goingLeft;
     boolean facingLeft;
+    
+    /**Occasionally, it may be desired that collisions are ignored*/
     boolean ignoreCollision;
 
+    /**set to false if sound initialization doesn't complete*/
     boolean soundImplemented;
 
+    
     BufferedImage curSprite;
     BufferedImage rightwalk[];
     BufferedImage leftwalk[];
@@ -62,14 +88,13 @@ public abstract class Actor extends Collidable{
     Clip walk2;
     Clip land;
 
-    AffineTransform at;
+   
 
     Actor(String str, int X, int Y)
     {
         initImages(str);
         initPhys(X,Y);
 
-        at=new AffineTransform();
 
         onTheGround=true;
         ignoreCollision=false;
@@ -77,7 +102,8 @@ public abstract class Actor extends Collidable{
         goingLeft=false;
         facingLeft=false;
     }
-
+    
+    /**this is just a subroutine to make things cleaner*/
     final void initPhys(int X, int Y)
     {
         x=X;
@@ -92,7 +118,8 @@ public abstract class Actor extends Collidable{
         accelX=0;
         accelY=Global.gravity;
     }
-
+    
+    /**this is just a subroutine to make things cleaner*/
     final void initImages(String str)
     {
         String prefix="Data/images/"+str+"/";
@@ -122,6 +149,7 @@ public abstract class Actor extends Collidable{
         catch(Exception e){e.printStackTrace();}
     }
 
+    /**this is just a subroutine to make things cleaner*/
     void initSounds(String str)
     {
 
@@ -149,46 +177,58 @@ public abstract class Actor extends Collidable{
     int getHeight()
     {
         return curSprite.getHeight();
-
     }
 
     int getWidth()
     {
         return curSprite.getWidth();
-
     }
 
-    void draw(Graphics2D g) {        
+    void draw(Graphics2D g) 
+    {        
         g.drawImage(curSprite, Math.round(x), Math.round(y), null);        
     }
-
-
-    void update(GameObjects go)
+    
+    void tryMoveX(float delx, GameObjects go)
     {
-        updateVel();
-
-        ArrayList<Terrain> terrains=go.getTerrains();
-        ArrayList<Actor> actors=go.getActors();
-
-        float delx = velX * Global.timeStep;
-        //System.out.println("delx: "+delx+"\nx: "+x);
-        x+=delx;
-        
-        collideTerrain(terrains,delx);
-        
-        //collideActors(actors,delx);
-       
-
-        float dely = velY * Global.timeStep;
-        System.out.println("velY: "+velY);
-        y += dely;
-        System.out.println("dely: "+dely+"\ny: "+y);
-
-        boolean bk = false;
-
-        for (int i = 0; i<terrains.size();++i)
-        {
-            if (collidesWith(terrains.get(i)))
+         x+=delx;
+         
+         if(!ignoreCollision)
+         {
+             for(Terrain i:go.getTerrains())
+             {
+                 if(collidesWith(i))
+                 {
+                    setXtoEdge(i);
+                 }
+             }
+         }
+         for(Actor i:go.getActors())
+         {
+             if(this.equals(i))
+                 continue;
+             else if(collidesWith(i))
+             {
+                setXtoEdge(i);
+             }
+         }       
+    }
+    
+    void setXtoEdge(Collidable i)
+    {
+        float otherx = i.getX();
+        //set x to be either the right edge of the collidable,
+        //or the left edge-cursprite's width
+        x = i.getX() + ((x < otherx) ? -curSprite.getWidth()
+                         : i.getWidth());
+    }
+    void tryMoveY(float delY, GameObjects go)
+    {
+         boolean bk = false;
+         y+=delY;
+        for (Terrain i:go.getTerrains())
+        {            
+            if (collidesWith(i))
             {
                 if (velY > 0)
                 {
@@ -200,7 +240,7 @@ public abstract class Actor extends Collidable{
                             playClip(land);
                         }
                         velY = 0;
-                        y =terrains.get(i).getY() - curSprite.getHeight();
+                        y = i.getY() - curSprite.getHeight();
                     }
                     else
                     {
@@ -219,6 +259,26 @@ public abstract class Actor extends Collidable{
         if (!bk) {
             ignoreCollision = false;
         }
+    }
+    
+
+    void update(GameObjects go)
+    {
+      
+        updateVel();
+
+        ArrayList<Terrain> terrains=go.getTerrains();
+        ArrayList<Actor> actors=go.getActors();
+
+        float delx = velX * Global.timeStep;
+        tryMoveX(delx,go);
+        
+             
+       
+        float dely = velY * Global.timeStep;
+        tryMoveY(dely,go);
+
+       
 
         if ((Math.abs(velX) > .001f) && onTheGround)
         {
@@ -282,7 +342,6 @@ public abstract class Actor extends Collidable{
         }
 
         velX += accelX * Global.timeStep;
-
         velY += accelY * Global.timeStep;
 
         if (Math.abs(velX) > maxVelX) {
@@ -293,54 +352,8 @@ public abstract class Actor extends Collidable{
             velY = (velY < 0) ? -maxVelY : maxVelY;
         }
     }
-
-    void collideTerrain(ArrayList<Terrain> terrains,float delx)
-    {
-        if (!ignoreCollision) {
-            for (int i = 0; i< terrains.size(); ++i)
-            {
-                if (collidesWith(terrains.get(i)))
-                {
-                    x -= delx;
-                    if (onTheGround)
-                    {
-                        float otherx = terrains.get(i).getX();
-
-                        //set x to be either the right edge of the collidable,
-                        //or the left edge-cursprite's width
-                        x = terrains.get(i).getX() +
-                                ((x < otherx) ? -curSprite.getWidth()
-                                : terrains.get(i).getWidth());
-                    }
-                    break;
-                }
-            }
-        }
-    }
-    void collideActors(ArrayList<Actor> actors,float delx)
-    {
-        if (!ignoreCollision) {
-            for (int i = 0; i< actors.size(); ++i)
-            {
-                if (collidesWith(actors.get(i)))
-                {
-                    x -= delx;
-                    if (onTheGround)
-                    {
-                        float otherx = actors.get(i).getX();
-
-                        //set x to be either the right edge of the collidable,
-                        //or the left edge-cursprite's width
-                        x = actors.get(i).getX() +
-                                ((x < otherx) ? -curSprite.getWidth()
-                                : actors.get(i).getWidth());
-                    }
-                    break;
-                }
-            }
-        }
-
-    }
+  
+    
      void playClip(Clip clip)
     {
         if (soundImplemented)
