@@ -78,6 +78,7 @@ public class Game extends JPanel implements KeyListener {
        
         buff        = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
         buffg       = (Graphics2D)buff.createGraphics();
+        buffg.setBackground(Color.cyan);
 
         running=true;
 
@@ -135,21 +136,9 @@ public class Game extends JPanel implements KeyListener {
 
     }
 
-    void drawToForeground()
-    {
-        at.setToTranslation(-Global.OffsetX,-Global.OffsetY);
-        buffg.setTransform(at);
-        
-        gameObjects.draw(buffg);
-
-        wrinkle.draw(buffg);
-
-    }
-    
-
     void drawBackground()
     {
-        buffg.setBackground(Color.cyan);
+        
         buffg.clearRect(0,0,Global.WinX,Global.WinY);
         
         for(int i=0;i<backgrounds.length;++i)
@@ -170,7 +159,19 @@ public class Game extends JPanel implements KeyListener {
         buffg.setTransform(at);       
 
     }
-    
+
+    void drawToForeground()
+    {
+        //buffg.clearRect(0, 0, Global.WinX, Global.WinY);
+        at.setToTranslation(-Global.OffsetX,-Global.OffsetY);
+        buffg.setTransform(at);
+        
+        gameObjects.draw(buffg);
+
+        wrinkle.draw(buffg);
+
+    }
+
     void go()
     {
     
@@ -180,6 +181,8 @@ public class Game extends JPanel implements KeyListener {
     drawBackground();
     drawToForeground();
     panel=(Graphics2D)this.getGraphics();
+    panel.setBackground(Color.CYAN);
+    panel.clearRect(0, 0, Global.WinX, Global.WinY);
     panel.drawImage(buff,0,0, this);
     }
     void loop()

@@ -17,13 +17,16 @@ import java.util.ArrayList;
  */
 public final class Wrinkle extends Actor {
 
+   boolean biting;
+
+   int hearts;
     /**
      *Enum to flag what 'copy mode' wrinkle is using
      *@author a.bresee
      */
-    enum Mode{normal,bird,dragon};
-    Mode m;
-
+    enum JobMode{normal,bird,dragon};
+    JobMode m;
+    
     
     /**
      *Default ctor calls parameterized ctor
@@ -38,13 +41,38 @@ public final class Wrinkle extends Actor {
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
         mass = 1;
-        curSprite = rightidle;
-        m=Mode.normal;
+        curSprite = rightIdle;
+        m=JobMode.normal;
+        biting=false;
+        hearts=3;
     }
 
     /**
      *Defines behavior of "jump" action. Called when player jumps.
      */
+    void hurt()
+    {
+        if (hearts>0)
+        {
+            hearts-=1;
+        }
+        else
+        {
+            die();
+        }
+
+    }
+    void die()
+    {
+        velX=0;
+        velY=0;
+        accelX=0;
+        accelY=0;
+        onTheGround=false;
+        ignoreCollision=true;
+        
+    }
+
     void jump() {
         if (onTheGround) {
             playClip(jumpsnd);
@@ -62,7 +90,7 @@ public final class Wrinkle extends Actor {
     {
         if (!goingRight)
         {
-            curSprite = rightwalk[0];
+            curSprite = rightWalk[0];
             frame = 0;
             timecount = 0;
             facingLeft = false;
@@ -86,7 +114,7 @@ public final class Wrinkle extends Actor {
     void goLeft()
     {
         if (!goingLeft) {
-            curSprite = leftwalk[0];
+            curSprite = leftWalk[0];
             frame = 0;
             timecount = 0;
             facingLeft = true;
@@ -144,4 +172,20 @@ public final class Wrinkle extends Actor {
         super.update(go);
         correctOffsets();
     }
+
+    @Override
+    boolean roar(Actor a)
+    {
+        if (this.isFacing(a))
+        {
+         if(biting)
+         {
+            a.hurt();
+            return false;
+         }
+        }
+        return true;
+    }
+   
+    
 }

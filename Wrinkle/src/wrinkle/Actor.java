@@ -29,6 +29,8 @@ public abstract class Actor extends Collidable{
      */
     enum direction{x,y};
 
+    String state;
+
     float velX;
     float velY;
     float accelX;
@@ -74,10 +76,10 @@ public abstract class Actor extends Collidable{
 
     
     BufferedImage curSprite;
-    BufferedImage rightwalk[];
-    BufferedImage leftwalk[];
-    BufferedImage rightidle;
-    BufferedImage leftidle;
+    BufferedImage rightWalk[];
+    BufferedImage leftWalk[];
+    BufferedImage rightIdle;
+    BufferedImage leftIdle;
     BufferedImage rightJump;
     BufferedImage leftJump;
 
@@ -88,7 +90,8 @@ public abstract class Actor extends Collidable{
     Clip walk2;
     Clip land;
 
-   
+    abstract void hurt();
+    abstract void die();
 
     Actor(String str, int X, int Y)
     {
@@ -123,23 +126,23 @@ public abstract class Actor extends Collidable{
     final void initImages(String str)
     {
         String prefix="Data/images/"+str+"/";
-        rightwalk=new BufferedImage[Global.framecount];
-        leftwalk=new BufferedImage[Global.framecount];
+        rightWalk=new BufferedImage[Global.framecount];
+        leftWalk=new BufferedImage[Global.framecount];
         try
         {
-            rightidle=ImageIO.read(new File(prefix+"rightidle.png"));
-            leftidle=ImageIO.read(new File(prefix+"leftidle.png"));
+            rightIdle=ImageIO.read(new File(prefix+"rightidle.png"));
+            leftIdle=ImageIO.read(new File(prefix+"leftidle.png"));
             String name="rightwalk";
 
             for(int i=0;i<Global.framecount;++i)
             {
-              rightwalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
+              rightWalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
             }
 
             name="leftwalk";
             for(int i=0;i<Global.framecount;++i)
             {
-                leftwalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
+                leftWalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
             }
 
             rightJump=ImageIO.read(new File(prefix+"rightjump.png"));
@@ -188,7 +191,11 @@ public abstract class Actor extends Collidable{
     {        
         g.drawImage(curSprite, Math.round(x), Math.round(y), null);        
     }
-    
+    boolean roar(Actor a)
+    {
+        return true;
+    }
+
     void tryMoveX(float delx, GameObjects go)
     {
          x+=delx;
@@ -199,7 +206,8 @@ public abstract class Actor extends Collidable{
              {
                  if(collidesWith(i))
                  {
-                    setXtoEdge(i);
+                   
+                     setXtoEdge(i);
                  }
              }
          }
@@ -209,7 +217,8 @@ public abstract class Actor extends Collidable{
                  continue;
              else if(collidesWith(i))
              {
-                setXtoEdge(i);
+                 if(roar(i))
+                     setXtoEdge(i);
              }
          }       
     }
@@ -222,6 +231,7 @@ public abstract class Actor extends Collidable{
         x = i.getX() + ((x < otherx) ? -curSprite.getWidth()
                          : i.getWidth());
     }
+
     void tryMoveY(float delY, GameObjects go)
     {
          boolean bk = false;
@@ -256,6 +266,41 @@ public abstract class Actor extends Collidable{
                 }
             }
         }
+        for (Actor i:go.getActors())
+        {
+            if(this.equals(i))
+                continue;
+            if (collidesWith(i))
+            {
+                if (velY > 0)
+                {
+                    if (!ignoreCollision)
+                    {
+                        if (!onTheGround)
+                        {
+                            onTheGround = true;
+                            playClip(land);
+                        }
+                        velY = 0;
+                        y = i.getY() - curSprite.getHeight();
+                    }
+                    else
+                    {
+                        bk = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    ignoreCollision = true;
+                    bk = true;
+                    break;
+                }
+            }
+        }
+        if (!bk) {
+            ignoreCollision = false;
+        }
         if (!bk) {
             ignoreCollision = false;
         }
@@ -267,19 +312,18 @@ public abstract class Actor extends Collidable{
       
         updateVel();
 
-        ArrayList<Terrain> terrains=go.getTerrains();
-        ArrayList<Actor> actors=go.getActors();
-
         float delx = velX * Global.timeStep;
         tryMoveX(delx,go);
         
-             
-       
         float dely = velY * Global.timeStep;
         tryMoveY(dely,go);
 
-       
-
+        updateState();
+        
+        updateAnim();
+        
+        updateSound();
+        
         if ((Math.abs(velX) > .001f) && onTheGround)
         {
             if (timecount == frametime)
@@ -292,7 +336,7 @@ public abstract class Actor extends Collidable{
                 {
                     playClip(walk2);
                 }
-                curSprite = (facingLeft) ? leftwalk[frame] : rightwalk[frame];
+                curSprite = (facingLeft) ? leftWalk[frame] : rightWalk[frame];
                 frame =(frame < Global.framecount - 1) ? (frame + 1) : 0;
             }
             else
@@ -305,9 +349,57 @@ public abstract class Actor extends Collidable{
 
             //if the actor is on the ground, pick between which idle sprite
             //should be displayed based on what direction it is facing
-            curSprite = (facingLeft) ? leftidle : rightidle;
+            curSprite = (facingLeft) ? leftIdle : rightIdle;
         }
 
+    }
+    void updateState()
+    {
+         if (onTheGround)
+         {
+             if(Math.abs(velX) > .001f)
+                state="running";
+             else
+                 state="idle";
+         }             
+         else
+             state="jumping";
+    }
+    
+    void updateAnim()
+    {
+         if (state=="running")
+        {
+            if (timecount == frametime)
+            {
+                timecount = 0;
+                if (frame % 2 == 0)
+                {
+                    playClip(walk1);
+                } else
+                {
+                    playClip(walk2);
+                }
+                curSprite = (facingLeft) ? leftWalk[frame] : rightWalk[frame];
+                frame =(frame < Global.framecount - 1) ? (frame + 1) : 0;
+            }
+            else
+            {
+                ++timecount;
+            }
+        }
+         else if(state=="idle")
+         {
+                 curSprite = (facingLeft) ? leftIdle : rightIdle;
+         }
+         else if(state=="jumping")
+         {
+             curSprite = (facingLeft) ? leftJump : rightJump;
+         }
+    }
+    void updateSound()
+    {
+        
     }
 
 
@@ -352,7 +444,11 @@ public abstract class Actor extends Collidable{
             velY = (velY < 0) ? -maxVelY : maxVelY;
         }
     }
-  
+
+    boolean isFacing(Collidable c)
+    {
+        return ((x<c.getX())&&!facingLeft)||(x>c.getX()&&facingLeft);
+    }
     
      void playClip(Clip clip)
     {

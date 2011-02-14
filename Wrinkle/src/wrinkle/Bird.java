@@ -20,7 +20,7 @@ public final class Bird extends Enemy
     Bird(int X, int Y)
     {
         super("bird",X,Y);
-        curSprite=leftidle;
+        curSprite=leftIdle;
         System.out.println("yes");
     }
 //   void update(GameObjects go)
@@ -43,6 +43,14 @@ public final class Bird extends Enemy
             velY = (velY < 0) ? -maxVelY : maxVelY;
         }
 
+    }
+    void die()
+    {
+
+    }
+    void hurt()
+    {
+        
     }
     
 }
