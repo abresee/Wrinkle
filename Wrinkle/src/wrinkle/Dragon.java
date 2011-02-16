@@ -19,4 +19,15 @@ public final class Dragon  extends Enemy{
     {
         super("dragon",X,Y);
     }
+
+    @Override
+    void die()
+    {
+
+    }
+    @Override
+    void hurt()
+    {
+
+    }
 }

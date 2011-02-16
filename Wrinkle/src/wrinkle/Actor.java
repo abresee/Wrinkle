@@ -49,7 +49,7 @@ public abstract class Actor extends Collidable{
     /**
      *How many game-frames should go by before the next animation frame is loaded
      */
-    int frametime=5;
+    int frametime=10;
     
     /*
      *Variable keeps track of game-frames since last animation frame change
@@ -67,6 +67,7 @@ public abstract class Actor extends Collidable{
     boolean goingRight;
     boolean goingLeft;
     boolean facingLeft;
+    boolean friction;
     
     /**Occasionally, it may be desired that collisions are ignored*/
     boolean ignoreCollision;
@@ -75,7 +76,7 @@ public abstract class Actor extends Collidable{
     boolean soundImplemented;
 
     
-    BufferedImage curSprite;
+    protected BufferedImage curSprite;
     BufferedImage rightWalk[];
     BufferedImage leftWalk[];
     BufferedImage rightIdle;
@@ -93,10 +94,15 @@ public abstract class Actor extends Collidable{
     abstract void hurt();
     abstract void die();
 
-    Actor(String str, int X, int Y)
+    Actor(String str, float X, float Y)
+    {
+        this(str, X, Y, 0, 0, 0, Global.gravity);
+    }
+    Actor(String str,float X, float Y, float velX_, float velY_,
+                        float accelX_, float accelY_ )
     {
         initImages(str);
-        initPhys(X,Y);
+        initPhys(X,Y, velX_, velY_, accelX_, accelY_);
 
 
         onTheGround=true;
@@ -107,19 +113,21 @@ public abstract class Actor extends Collidable{
     }
     
     /**this is just a subroutine to make things cleaner*/
-    final void initPhys(int X, int Y)
+    final void initPhys(float X, float Y, float velX_, float velY_,
+                        float accelX_, float accelY_)
     {
         x=X;
         y=Y;
 
-        velX=0;
-        velY=0;
+        velX=velX_;
+        velY=velY_;
 
         maxVelX=0.5f;
         maxVelY=3.0f;
 
-        accelX=0;
-        accelY=Global.gravity;
+        accelX=accelX_;
+        accelY=accelY_;
+        friction=true;
     }
     
     /**this is just a subroutine to make things cleaner*/
@@ -147,6 +155,7 @@ public abstract class Actor extends Collidable{
 
             rightJump=ImageIO.read(new File(prefix+"rightjump.png"));
             leftJump=ImageIO.read(new File(prefix+"leftjump.png"));
+            curSprite=leftIdle;
 
         }
         catch(Exception e){e.printStackTrace();}
@@ -206,8 +215,7 @@ public abstract class Actor extends Collidable{
              {
                  if(collidesWith(i))
                  {
-                   
-                     setXtoEdge(i);
+                    setXtoEdge(i);
                  }
              }
          }
@@ -416,7 +424,7 @@ public abstract class Actor extends Collidable{
             accelX = (velX > 0) ? -0.002f : -0.001f;
         }
 
-        else
+        else if(friction)
         {
             //apply horizontal friction
             if (Math.abs(velX * Global.timeStep) <= 1.0f)

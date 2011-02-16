@@ -7,9 +7,13 @@
  * and open the template in the editor.
  */
 package wrinkle;
-
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.Point;
+import java.awt.Graphics2D;
 import javax.sound.sampled.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.HashSet;
 
 /**
  * Class that defines the player character
@@ -18,6 +22,9 @@ import java.util.ArrayList;
 public final class Wrinkle extends Actor {
 
    boolean biting;
+
+
+   LinkedList<Fire> babies;
 
    int hearts;
     /**
@@ -40,8 +47,8 @@ public final class Wrinkle extends Actor {
      */
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
+        babies=new LinkedList<Fire>();
         mass = 1;
-        curSprite = rightIdle;
         m=JobMode.normal;
         biting=false;
         hearts=3;
@@ -165,12 +172,56 @@ public final class Wrinkle extends Actor {
             Global.OffsetY = (y + curSprite.getHeight()) - (Global.WinY - 50);
         }
     }
+    void breatheFire()
+    {
+        PointerInfo a = MouseInfo.getPointerInfo();
+        Point b  = a.getLocation();
+        double x_ = b.getX();
+        double y_ = b.getY();
+        System.out.println("x_: "+x_+"\ny_: "+y_);
+        double delx = x_-(x-Global.OffsetX);
+        double dely = y_-(y-Global.OffsetY);
+
+        double angle=Math.atan2(dely,delx);
+        //double mag=Math.sqrt(delx*delx+dely*dely);
+        float velx_=(float)Math.cos(angle);
+        float vely_=(float)Math.sin(angle);
+
+        System.out.println("angle: "+angle+"\nvely: "+vely_+"\nvelx: "+velx_);
+        babies.add(new Fire(x,y,velx_,vely_,angle));
+    }
 
     @Override
     void update(GameObjects go)
     {
         super.update(go);
+        LinkedList<Fire> bab2=new LinkedList<Fire>();
+        synchronized(babies)
+        {
+            for(Fire i:babies)
+            {
+                if(!i.isDead())
+                {
+                    i.update(go);
+                    bab2.add(i);
+                }
+                
+            }
+        }
+        babies=bab2;
         correctOffsets();
+    }
+
+    void draw(Graphics2D g)
+    {
+        super.draw(g);
+        
+        {
+            for(Fire i:babies)
+            {
+                i.draw(g);
+            }
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 
 
+
 /**
  * Class representing the actual game simulation itself. 
  * @author a.bresee
@@ -113,11 +114,17 @@ public class Game extends JPanel implements KeyListener {
             case KeyEvent.VK_SPACE:
                 wrinkle.jump();
                 break;
-            case KeyEvent.VK_RIGHT:
+
+            case KeyEvent.VK_D:
                 wrinkle.goRight();
                 break;
-            case KeyEvent.VK_LEFT:
+
+            case KeyEvent.VK_A:
                 wrinkle.goLeft();
+                break;
+
+            case KeyEvent.VK_Q:
+                wrinkle.breatheFire();
                 break;
         }
     }
@@ -125,15 +132,16 @@ public class Game extends JPanel implements KeyListener {
     public void keyReleased(KeyEvent e)
     {
         int key=e.getKeyCode();
-        if (key==KeyEvent.VK_RIGHT)
+        switch(key)
         {
-            wrinkle.unGoRight();
+            case KeyEvent.VK_D:
+                wrinkle.unGoRight();
+                break;
+        
+            case KeyEvent.VK_A:
+                wrinkle.unGoLeft();
+                break;
         }
-        else if(key == KeyEvent.VK_LEFT)
-        {
-            wrinkle.unGoLeft();
-        }
-
     }
 
     void drawBackground()
@@ -195,7 +203,7 @@ public class Game extends JPanel implements KeyListener {
             go();
             
             time=System.currentTimeMillis()-time;
-            System.out.println(time);
+            //System.out.println("time elapsed on that frame: "+time);
             if(time<Global.timeStep)
             {
                 try

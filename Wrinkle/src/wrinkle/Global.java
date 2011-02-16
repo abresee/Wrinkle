@@ -30,6 +30,7 @@ public class Global{
     {
         try
         {
+
             Clip clip;
             AudioInputStream as=AudioSystem.getAudioInputStream(
                                          new File(str));
@@ -42,6 +43,12 @@ public class Global{
         {
             throw e;
         }
+
     }
     
 }
+
+
+
+
+

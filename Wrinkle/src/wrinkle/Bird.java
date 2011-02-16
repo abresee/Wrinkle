@@ -21,7 +21,6 @@ public final class Bird extends Enemy
     {
         super("bird",X,Y);
         curSprite=leftIdle;
-        System.out.println("yes");
     }
 //   void update(GameObjects go)
 //    {
@@ -31,8 +30,6 @@ public final class Bird extends Enemy
     void draw(Graphics2D g)
     {
         super.draw(g);
-        System.out.println("bird drawn at x "+x+" y "+y);
-        System.out.println("velX: "+velX+"\n velY: "+velY);
     }
     @Override
     void updateVel()
