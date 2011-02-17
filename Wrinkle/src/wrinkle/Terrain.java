@@ -16,17 +16,22 @@ import java.awt.*;
  * Class for the game world's terrain
  * @author a.bresee
  */
-public class Terrain extends Collidable
+public class Terrain extends staticCollidable
 {
    int width;
    int height;
    
    Color color;
-   
+
+   @Override
    int getWidth(){return width;}
+   @Override
    int getHeight(){return height;}
-    
+
+   @Override
    void generateBoundingBox(){}
+
+   @Override
    void draw(Graphics2D g)
    {
        g.setColor(color); 
@@ -49,6 +54,6 @@ public class Terrain extends Collidable
        width=Width;
        height=Height;
        color=c;
-       bBox=new Rectangle2D.Float(x,y,width,height);
+       collideShape=new Rectangle2D.Float(x,y,width,height);
    }
 }

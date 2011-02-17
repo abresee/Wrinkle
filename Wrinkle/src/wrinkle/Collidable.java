@@ -11,6 +11,7 @@ package wrinkle;
 
 import java.awt.geom.*;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 /**
  * Abstract superclass of anything that can collide with anything else
@@ -18,25 +19,25 @@ import java.awt.Graphics2D;
  */
 public abstract class Collidable
 {
+    /** x position */
     float x;
+    /** y position */
     float y;
+    protected BufferedImage curSprite;
+    Rectangle2D collideShape;
     float getX(){return x;}
     float getY(){return y;}
-    abstract int getWidth();
-    abstract int getHeight();
-    
-    
-    Rectangle2D bBox;
-    public Rectangle2D getbBox(){return bBox;}
-    abstract void generateBoundingBox();
-    abstract void draw(Graphics2D g);
-    
-    public boolean collidesWith(Collidable c)
+    int getWidth(){return curSprite.getWidth();}
+    int getHeight(){return curSprite.getHeight();}
+    void draw(Graphics2D g)
     {
-        generateBoundingBox();
-        c.generateBoundingBox();
-        boolean b=bBox.intersects(c.getbBox());
-        return b;
+        g.drawImage(curSprite, Math.round(x), Math.round(y), null);
     }
+    void generateBoundingBox()
+    {
+      collideShape=new Rectangle2D.Float(x,y,curSprite.getWidth(),curSprite.getHeight());
+    }
+    public Rectangle2D getbBox(){return collideShape;}
+   
             
 }

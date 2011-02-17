@@ -10,80 +10,35 @@
 package wrinkle;
 
 import java.awt.image.BufferedImage;
-import java.awt.geom.*;
 import javax.imageio.ImageIO;
 import java.io.File;
 import javax.sound.sampled.*;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
 
 /**
  * Abstract superclass of game actors -- that is, objects that have animations,
  * sounds, etc. 
  * @author a.bresee
  */
-public abstract class Actor extends Collidable{    
+public abstract class Actor extends activeCollidable{
 
     /**
      *Currently Unused enum to flag direction, to simplify collision code
      */
-    enum direction{x,y};
 
     String state;
 
-    float velX;
-    float velY;
-    float accelX;
-    float accelY;
-    float maxVelX;
-    float maxVelY;
     
-    float delX;
-    float delY;
-
-    /**
-     *Currently unused - mass for calculating momentum changes in collisions
-     */
-    float mass;
-    
-    /**
-     *How many game-frames should go by before the next animation frame is loaded
-     */
-    int frametime=10;
-    
-    /*
-     *Variable keeps track of game-frames since last animation frame change
-     */
-    
-    int timecount=0;
-    
-    /**
-     *variable keeps track of what frame we're on in an animation sequence
-     */
-    int frame=0;
-
-    
-    boolean onTheGround;
-    boolean goingRight;
-    boolean goingLeft;
-    boolean facingLeft;
-    boolean friction;
-    
-    /**Occasionally, it may be desired that collisions are ignored*/
-    boolean ignoreCollision;
-
     /**set to false if sound initialization doesn't complete*/
     boolean soundImplemented;
 
     
-    protected BufferedImage curSprite;
+   
     BufferedImage rightWalk[];
     BufferedImage leftWalk[];
     BufferedImage rightIdle;
     BufferedImage leftIdle;
     BufferedImage rightJump;
     BufferedImage leftJump;
-
 
 
     Clip jumpsnd;
@@ -101,34 +56,15 @@ public abstract class Actor extends Collidable{
     Actor(String str,float X, float Y, float velX_, float velY_,
                         float accelX_, float accelY_ )
     {
+        
+        super(X, Y, velX_, velY_, accelX_, accelY_);
         initImages(str);
-        initPhys(X,Y, velX_, velY_, accelX_, accelY_);
-
-
-        onTheGround=true;
-        ignoreCollision=false;
-        goingRight=false;
-        goingLeft=false;
-        facingLeft=false;
+         initSounds(str);
+        
+        
     }
     
-    /**this is just a subroutine to make things cleaner*/
-    final void initPhys(float X, float Y, float velX_, float velY_,
-                        float accelX_, float accelY_)
-    {
-        x=X;
-        y=Y;
-
-        velX=velX_;
-        velY=velY_;
-
-        maxVelX=0.5f;
-        maxVelY=3.0f;
-
-        accelX=accelX_;
-        accelY=accelY_;
-        friction=true;
-    }
+   
     
     /**this is just a subroutine to make things cleaner*/
     final void initImages(String str)
@@ -162,7 +98,7 @@ public abstract class Actor extends Collidable{
     }
 
     /**this is just a subroutine to make things cleaner*/
-    void initSounds(String str)
+    final void initSounds(String str)
     {
 
         String prefix="Data/audio/"+str+"/";
@@ -181,54 +117,21 @@ public abstract class Actor extends Collidable{
         }
 
     }
-    void generateBoundingBox()
-    {
-      bBox=new Rectangle2D.Float(x,y,curSprite.getWidth(),curSprite.getHeight());
-    }
-
-    int getHeight()
-    {
-        return curSprite.getHeight();
-    }
-
-    int getWidth()
-    {
-        return curSprite.getWidth();
-    }
-
-    void draw(Graphics2D g) 
-    {        
-        g.drawImage(curSprite, Math.round(x), Math.round(y), null);        
-    }
+    
     boolean roar(Actor a)
     {
         return true;
     }
 
-    void tryMoveX(float delx, GameObjects go)
+    void handleTerrainCollisionX(Terrain i)
     {
-         x+=delx;
-         
-         if(!ignoreCollision)
-         {
-             for(Terrain i:go.getTerrains())
-             {
-                 if(collidesWith(i))
-                 {
-                    setXtoEdge(i);
-                 }
-             }
-         }
-         for(Actor i:go.getActors())
-         {
-             if(this.equals(i))
-                 continue;
-             else if(collidesWith(i))
-             {
-                 if(roar(i))
-                     setXtoEdge(i);
-             }
-         }       
+         setXtoEdge(i);
+    }
+
+    void handleActorCollisionX(Actor i)
+    {
+         if(roar(i))
+            setXtoEdge(i);
     }
     
     void setXtoEdge(Collidable i)
@@ -240,15 +143,9 @@ public abstract class Actor extends Collidable{
                          : i.getWidth());
     }
 
-    void tryMoveY(float delY, GameObjects go)
+    void handleTerrainCollisionY(Terrain i)
     {
-         boolean bk = false;
-         y+=delY;
-        for (Terrain i:go.getTerrains())
-        {            
-            if (collidesWith(i))
-            {
-                if (velY > 0)
+     if (velY > 0)
                 {
                     if (!ignoreCollision)
                     {
@@ -260,107 +157,34 @@ public abstract class Actor extends Collidable{
                         velY = 0;
                         y = i.getY() - curSprite.getHeight();
                     }
-                    else
-                    {
-                        bk = true;
-                        break;
-                    }
                 }
                 else
                 {
                     ignoreCollision = true;
-                    bk = true;
-                    break;
                 }
-            }
-        }
-        for (Actor i:go.getActors())
-        {
-            if(this.equals(i))
-                continue;
-            if (collidesWith(i))
-            {
-                if (velY > 0)
-                {
-                    if (!ignoreCollision)
-                    {
-                        if (!onTheGround)
-                        {
-                            onTheGround = true;
-                            playClip(land);
-                        }
-                        velY = 0;
-                        y = i.getY() - curSprite.getHeight();
-                    }
-                    else
-                    {
-                        bk = true;
-                        break;
-                    }
-                }
-                else
-                {
-                    ignoreCollision = true;
-                    bk = true;
-                    break;
-                }
-            }
-        }
-        if (!bk) {
-            ignoreCollision = false;
-        }
-        if (!bk) {
-            ignoreCollision = false;
-        }
     }
-    
-
-    void update(GameObjects go)
+   void handleActorCollisionY(Actor i)
     {
-      
-        updateVel();
-
-        float delx = velX * Global.timeStep;
-        tryMoveX(delx,go);
-        
-        float dely = velY * Global.timeStep;
-        tryMoveY(dely,go);
-
-        updateState();
-        
-        updateAnim();
-        
-        updateSound();
-        
-        if ((Math.abs(velX) > .001f) && onTheGround)
+       if (velY > 0)
         {
-            if (timecount == frametime)
+            if (!ignoreCollision)
             {
-                timecount = 0;
-                if (frame % 2 == 0)
+                if (!onTheGround)
                 {
-                    playClip(walk1);
-                } else
-                {
-                    playClip(walk2);
+                    onTheGround = true;
+                    playClip(land);
                 }
-                curSprite = (facingLeft) ? leftWalk[frame] : rightWalk[frame];
-                frame =(frame < Global.framecount - 1) ? (frame + 1) : 0;
+                velY = 0;
+                y = i.getY() - curSprite.getHeight();
             }
-            else
-            {
-                ++timecount;
-            }
+
         }
-        if (velX == 0 && onTheGround)
+        else
         {
-
-            //if the actor is on the ground, pick between which idle sprite
-            //should be displayed based on what direction it is facing
-            curSprite = (facingLeft) ? leftIdle : rightIdle;
+            ignoreCollision = true;
         }
-
-    }
+   }
+   
     void updateState()
     {
          if (onTheGround)
@@ -457,7 +281,12 @@ public abstract class Actor extends Collidable{
     {
         return ((x<c.getX())&&!facingLeft)||(x>c.getX()&&facingLeft);
     }
-    
+    /**
+     *Plays the sound file contained in the clip param. if <code>soundImplemented
+     *</code> is false, nothing happens. This is to prevent errors on systems without
+     *sound
+     *@param Clip is a well-formed clip, loaded with data
+     */
      void playClip(Clip clip)
     {
         if (soundImplemented)

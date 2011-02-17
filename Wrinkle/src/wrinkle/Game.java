@@ -147,7 +147,7 @@ public class Game extends JPanel implements KeyListener {
     void drawBackground()
     {
         
-        buffg.clearRect(0,0,Global.WinX,Global.WinY);
+        //buffg.clearRect(0,0,Global.WinX,Global.WinY);
         
         for(int i=0;i<backgrounds.length;++i)
         {
@@ -190,7 +190,7 @@ public class Game extends JPanel implements KeyListener {
     drawToForeground();
     panel=(Graphics2D)this.getGraphics();
     panel.setBackground(Color.CYAN);
-    panel.clearRect(0, 0, Global.WinX, Global.WinY);
+    //panel.clearRect(0, 0, Global.WinX, Global.WinY);
     panel.drawImage(buff,0,0, this);
     }
     void loop()

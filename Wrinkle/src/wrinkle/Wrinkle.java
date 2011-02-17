@@ -13,7 +13,6 @@ import java.awt.Point;
 import java.awt.Graphics2D;
 import javax.sound.sampled.*;
 import java.util.LinkedList;
-import java.util.HashSet;
 
 /**
  * Class that defines the player character
@@ -139,16 +138,6 @@ public final class Wrinkle extends Actor {
         goingLeft = false;
     }
     
-    /**
-     *Plays the sound file contained in the clip param. if <code>soundImplemented 
-     *</code> is false, nothing happens. This is to prevent errors on systems without
-     *sound
-     *@param Clip is a well-formed clip, loaded with data
-     */
-   
-
-   
-    
 
     void correctOffsets()
     {
@@ -178,7 +167,6 @@ public final class Wrinkle extends Actor {
         Point b  = a.getLocation();
         double x_ = b.getX();
         double y_ = b.getY();
-        System.out.println("x_: "+x_+"\ny_: "+y_);
         double delx = x_-(x-Global.OffsetX);
         double dely = y_-(y-Global.OffsetY);
 
@@ -196,32 +184,29 @@ public final class Wrinkle extends Actor {
     {
         super.update(go);
         LinkedList<Fire> bab2=new LinkedList<Fire>();
-        synchronized(babies)
+        for(Fire i:babies)
         {
-            for(Fire i:babies)
+            if(!i.isDead())
             {
-                if(!i.isDead())
-                {
-                    i.update(go);
-                    bab2.add(i);
-                }
-                
+                i.update(go);
+                bab2.add(i);
             }
+
         }
+        
         babies=bab2;
         correctOffsets();
     }
-
+    @Override
     void draw(Graphics2D g)
     {
         super.draw(g);
         
+        for(Fire i:babies)
         {
-            for(Fire i:babies)
-            {
-                i.draw(g);
-            }
+            i.draw(g);
         }
+        
     }
 
     @Override
