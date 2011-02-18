@@ -11,7 +11,6 @@ import java.awt.MouseInfo;
 import java.awt.PointerInfo;
 import java.awt.Point;
 import java.awt.Graphics2D;
-import javax.sound.sampled.*;
 import java.util.LinkedList;
 
 /**
@@ -20,18 +19,19 @@ import java.util.LinkedList;
  */
 public final class Wrinkle extends Actor {
 
-   boolean biting;
+   private boolean biting;
+   private boolean breathingFire;
 
 
-   LinkedList<Fire> babies;
+   private LinkedList<Fire> fireList;
+   private final Object fireListLock;
 
-   int hearts;
     /**
      *Enum to flag what 'copy mode' wrinkle is using
      *@author a.bresee
      */
-    enum JobMode{normal,bird,dragon};
-    JobMode m;
+    private enum JobMode{normal,bird,dragon};
+    private JobMode m;
     
     
     /**
@@ -46,11 +46,13 @@ public final class Wrinkle extends Actor {
      */
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
-        babies=new LinkedList<Fire>();
+        fireList=new LinkedList<Fire>();
+        fireListLock=new Object();
         mass = 1;
         m=JobMode.normal;
         biting=false;
-        hearts=3;
+        breathingFire=false;
+        health=3;
     }
 
     /**
@@ -58,9 +60,9 @@ public final class Wrinkle extends Actor {
      */
     void hurt()
     {
-        if (hearts>0)
+        if (health>0)
         {
-            hearts-=1;
+            --health;
         }
         else
         {
@@ -79,15 +81,7 @@ public final class Wrinkle extends Actor {
         
     }
 
-    void jump() {
-        if (onTheGround) {
-            playClip(jumpsnd);
-            velY = -1.5f;
-            accelY = Global.gravity;
-            onTheGround = false;
-            curSprite = (facingLeft) ? leftJump : rightJump;
-        }
-    }
+   
     /**
      *Defines behavior of "right" action. Called when player presses the 
      *"right" key.
@@ -161,7 +155,7 @@ public final class Wrinkle extends Actor {
             Global.OffsetY = (y + curSprite.getHeight()) - (Global.WinY - 50);
         }
     }
-    void breatheFire()
+    void fire()
     {
         PointerInfo a = MouseInfo.getPointerInfo();
         Point b  = a.getLocation();
@@ -176,15 +170,28 @@ public final class Wrinkle extends Actor {
         float vely_=(float)Math.sin(angle);
 
         System.out.println("angle: "+angle+"\nvely: "+vely_+"\nvelx: "+velx_);
-        babies.add(new Fire(x,y,velx_,vely_,angle));
+
+        fireList.add(new Fire(x+getWidth()-5,y+12,velx_+velX,vely_+velY,angle));
+    }
+    void breatheFire()
+    {
+       breathingFire=true;
+    }
+    void unBreatheFire()
+    {
+        breathingFire=false;
     }
 
     @Override
     void update(GameObjects go)
     {
         super.update(go);
+        if(breathingFire)
+        {
+            fire();
+        }
         LinkedList<Fire> bab2=new LinkedList<Fire>();
-        for(Fire i:babies)
+        for(Fire i:fireList)
         {
             if(!i.isDead())
             {
@@ -194,17 +201,21 @@ public final class Wrinkle extends Actor {
 
         }
         
-        babies=bab2;
+        fireList=bab2;
+        
         correctOffsets();
+        //System.out.println("wrinkle x: "+x+"\nwrinkle y: "+y);
     }
     @Override
     void draw(Graphics2D g)
     {
         super.draw(g);
-        
-        for(Fire i:babies)
+        synchronized(fireListLock)
         {
-            i.draw(g);
+            for(Fire i:fireList)
+            {
+                i.draw(g);
+            }
         }
         
     }

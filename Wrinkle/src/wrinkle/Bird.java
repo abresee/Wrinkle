@@ -20,12 +20,14 @@ public final class Bird extends Enemy
     Bird(int X, int Y)
     {
         super("bird",X,Y);
+        health=3;
         curSprite=leftIdle;
     }
-//   void update(GameObjects go)
-//    {
-//
-//    }
+   void update(GameObjects go)
+    {
+        jump();
+        super.update(go);
+    }
     @Override
     void draw(Graphics2D g)
     {
@@ -41,13 +43,10 @@ public final class Bird extends Enemy
         }
 
     }
-    void die()
-    {
-
-    }
-    void hurt()
-    {
-        
-    }
+//    void die()
+//    {
+//        super.die();
+//    }
+    
     
 }

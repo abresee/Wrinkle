@@ -16,7 +16,7 @@ import java.awt.*;
  * Class for the game world's terrain
  * @author a.bresee
  */
-public class Terrain extends staticCollidable
+public class Terrain extends StaticCollidable
 {
    int width;
    int height;

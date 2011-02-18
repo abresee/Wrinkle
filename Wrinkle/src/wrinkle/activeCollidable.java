@@ -9,7 +9,7 @@ import java.awt.geom.*;
  *
  * @author alex
  */
-abstract public class activeCollidable extends Collidable {
+abstract public class ActiveCollidable extends Collidable {
 
     /** x velocity */
     float velX;
@@ -50,7 +50,7 @@ abstract public class activeCollidable extends Collidable {
      */
     int frame=0;
 
-
+    boolean dead;
     boolean onTheGround;
     boolean goingRight;
     boolean goingLeft;
@@ -64,7 +64,7 @@ abstract public class activeCollidable extends Collidable {
 
 
     
-    activeCollidable(float X, float Y, float velX_, float velY_,
+    ActiveCollidable(float X, float Y, float velX_, float velY_,
                         float accelX_, float accelY_ )
     {
         initPhys(X,Y, velX_, velY_, accelX_, accelY_);
@@ -73,6 +73,7 @@ abstract public class activeCollidable extends Collidable {
         goingRight=false;
         goingLeft=false;
         facingLeft=false;
+        dead=false;
     }
 void generateBoundingBox()
     {
@@ -107,8 +108,14 @@ void generateBoundingBox()
     }
     public Rectangle2D getbBox(){return collideShape;}
 
-
-
+    void die()
+    {
+        dead=true;
+    }
+    boolean isDead()
+    {
+        return dead;
+    }
     public boolean collidesWith(Collidable c)
     {
         generateBoundingBox();
@@ -120,12 +127,13 @@ void generateBoundingBox()
     {
 
         updateVel();
-
+        float dely = velY * Global.timeStep;
+        tryMoveY(dely,go);
+        
         float delx = velX * Global.timeStep;
         tryMoveX(delx,go);
 
-        float dely = velY * Global.timeStep;
-        tryMoveY(dely,go);
+       
 
         updateState();
 

@@ -13,11 +13,11 @@ import java.io.File;
  *
  * @author a.bresee
  */
-public final class Fire extends activeCollidable{
+public final class Fire extends ActiveCollidable{
 
-    private boolean dead;
     private double angle;
     private static BufferedImage FireSprite;
+    //private float scaleFactor;
 
     private static boolean spriteInit=false;
    
@@ -31,12 +31,12 @@ public final class Fire extends activeCollidable{
         this(X,Y,velX_,velY_);
         angle=angle_;
         initImages();
+        //scaleFactor=.5f;
 
         System.out.println(angle);
         Graphics2D g=curSprite.createGraphics();
-        g.rotate(angle,FireSprite.getHeight()/2,FireSprite.getWidth()/2);
+        g.rotate(angle,FireSprite.getWidth()/2,FireSprite.getHeight()/2);
         g.drawImage(FireSprite,0,0,null);
-
     }
     final void initImages()
     {
@@ -62,6 +62,7 @@ public final class Fire extends activeCollidable{
     @Override
     void update(GameObjects go)
     {
+       // System.out.println("fire x: "+x+"\nfire y: "+y);
         super.update(go);
         if((x-Global.OffsetX>Global.WinX)||x-Global.OffsetX<0
                 ||(y-Global.OffsetY>Global.WinY)||(y-Global.OffsetY)<0)
@@ -69,6 +70,8 @@ public final class Fire extends activeCollidable{
             die();
         }
         frame++;
+        //scaleFactor=frame*0.05f+.5f;
+        
     }
     
     void die()
@@ -79,21 +82,27 @@ public final class Fire extends activeCollidable{
     {
 
     }
-    boolean isDead()
-    {
-        return dead;
-    }
+    
     @Override
     void draw(Graphics2D g)
     {
         AffineTransform at=g.getTransform();
-        g.scale(frame*0.05+.5, frame*0.05+.5);
+        g.translate((double)getWidth()/2, (double)getHeight()/2);
+       // g.scale(scaleFactor,scaleFactor);
+
         super.draw(g);
         g.setTransform(at);
     }
 
-    void handleTerrainCollisionX(Terrain i){}
-    void handleActorCollisionX(Actor i){}
+    void handleTerrainCollisionX(Terrain i)
+    {
+    die();
+    }
+    void handleActorCollisionX(Actor i)
+    {
+    i.hurt();
+    die();
+    }
     void handleTerrainCollisionY(Terrain i){}
     void handleActorCollisionY(Actor i){}
     void updateVel(){}

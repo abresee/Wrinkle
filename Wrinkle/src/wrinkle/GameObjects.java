@@ -7,14 +7,16 @@ package wrinkle;
 
 import java.util.ArrayList;
 import java.awt.Graphics2D;
+import java.util.Collections;
+import java.util.List;
 /**
  *
  * @author a.bresee
  */
 class GameObjects
 {
-    ArrayList<Terrain> terrains;
-    ArrayList<Actor> actors;
+    private ArrayList<Terrain> terrains;
+    private ArrayList<Actor> actors;
 
     GameObjects()
     {
@@ -32,14 +34,14 @@ class GameObjects
         actors.add(a);
     }
 
-    ArrayList<Terrain> getTerrains()
+    List<Terrain> getTerrains()
     {
-        return terrains;
+        return Collections.unmodifiableList(terrains);
     }
 
-    ArrayList<Actor> getActors()
+    List<Actor> getActors()
     {
-        return actors;
+        return Collections.unmodifiableList(actors);
     }
 
     void draw(Graphics2D g)
@@ -55,9 +57,15 @@ class GameObjects
     }
     void update()
     {
+        ArrayList<Actor> newActors=new ArrayList<Actor>();
         for(Actor i:actors)
         {
+            if(!i.isDead())
+            {
             i.update(this);
+            newActors.add(i);
+            }
         }
+        actors=newActors;
     }
 }

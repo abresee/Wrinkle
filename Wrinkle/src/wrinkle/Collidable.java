@@ -20,11 +20,11 @@ import java.awt.image.BufferedImage;
 public abstract class Collidable
 {
     /** x position */
-    float x;
+    protected float x;
     /** y position */
-    float y;
+    protected float y;
     protected BufferedImage curSprite;
-    Rectangle2D collideShape;
+    protected Rectangle2D collideShape;
     float getX(){return x;}
     float getY(){return y;}
     int getWidth(){return curSprite.getWidth();}

@@ -19,35 +19,41 @@ import javax.sound.sampled.*;
  * sounds, etc. 
  * @author a.bresee
  */
-public abstract class Actor extends activeCollidable{
+public abstract class Actor extends ActiveCollidable{
 
-    /**
-     *Currently Unused enum to flag direction, to simplify collision code
-     */
-
-    String state;
-
+    protected  String state;
+    protected int health;
     
     /**set to false if sound initialization doesn't complete*/
-    boolean soundImplemented;
+    private boolean soundImplemented;
 
     
    
-    BufferedImage rightWalk[];
-    BufferedImage leftWalk[];
-    BufferedImage rightIdle;
-    BufferedImage leftIdle;
-    BufferedImage rightJump;
-    BufferedImage leftJump;
+    protected BufferedImage rightWalk[];
+    protected BufferedImage leftWalk[];
+    protected BufferedImage rightIdle;
+    protected BufferedImage leftIdle;
+    protected BufferedImage rightJump;
+    protected BufferedImage leftJump;
 
 
-    Clip jumpsnd;
-    Clip walk1;
-    Clip walk2;
-    Clip land;
+    protected  Clip jumpsnd;
+    protected Clip walk1;
+    protected  Clip walk2;
+    protected  Clip land;
 
-    abstract void hurt();
-    abstract void die();
+    void hurt()
+    {
+        if(health>0)
+        {
+            --health;
+        System.out.println("bird hurt");
+        }
+        else
+        {
+            die();
+        }
+    }
 
     Actor(String str, float X, float Y)
     {
@@ -117,7 +123,16 @@ public abstract class Actor extends activeCollidable{
         }
 
     }
-    
+     void jump() {
+        if (onTheGround) {
+            playClip(jumpsnd);
+            velY = -1.5f;
+            accelY = Global.gravity;
+            onTheGround = false;
+            curSprite = (facingLeft) ? leftJump : rightJump;
+        }
+    }
+
     boolean roar(Actor a)
     {
         return true;
@@ -165,7 +180,7 @@ public abstract class Actor extends activeCollidable{
     }
    void handleActorCollisionY(Actor i)
     {
-       if (velY > 0)
+       if (y<i.getY())
         {
             if (!ignoreCollision)
             {

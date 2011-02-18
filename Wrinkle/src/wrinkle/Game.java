@@ -12,7 +12,9 @@ package wrinkle;
 
 import java.awt.*;
 import javax.swing.JPanel;
+
 import java.awt.image.BufferedImage;
+import javax.sound.sampled.*;
 import java.awt.geom.AffineTransform;
 import java.awt.event.*;
 import java.awt.Graphics2D;
@@ -34,27 +36,26 @@ import java.util.ArrayList;
 
 public class Game extends JPanel implements KeyListener {
 
-    Wrinkle wrinkle;
-
-    GameObjects gameObjects;
-
-    BufferedImage[] backgrounds;
-        
-    BufferedImage buff;
-
-    boolean bg1changed;
-    boolean bg2changed;
-    boolean bg3changed;
-
-    boolean running;
-
-    Graphics2D buffg;
-    Graphics2D panel;
-
-    AffineTransform at;
+    private Wrinkle wrinkle;
+    private GameObjects gameObjects;
+    private BufferedImage[] backgrounds;
+    private BufferedImage buff;
+    private boolean running;
+    private Graphics2D buffg;
+    private Graphics2D panel;
+    private AffineTransform at;
+    private Clip bgm;
 
     public Game()
     {
+        try{
+        bgm=Global.makeClip("Data/audio/bgm.wav");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        bgm.loop(Clip.LOOP_CONTINUOUSLY);
         setIgnoreRepaint(true);
         addKeyListener(this);
         setFocusable(true);
@@ -78,7 +79,7 @@ public class Game extends JPanel implements KeyListener {
 
        
         buff        = new BufferedImage(Global.WinX,Global.WinY,BufferedImage.TYPE_INT_RGB);
-        buffg       = (Graphics2D)buff.createGraphics();
+        buffg       = buff.createGraphics();
         buffg.setBackground(Color.cyan);
 
         running=true;
@@ -109,38 +110,39 @@ public class Game extends JPanel implements KeyListener {
     {
         int key=e.getKeyCode();
 
-        switch(key)
+        if(key==Config.Jump)
         {
-            case KeyEvent.VK_SPACE:
-                wrinkle.jump();
-                break;
-
-            case KeyEvent.VK_D:
-                wrinkle.goRight();
-                break;
-
-            case KeyEvent.VK_A:
-                wrinkle.goLeft();
-                break;
-
-            case KeyEvent.VK_Q:
-                wrinkle.breatheFire();
-                break;
+            wrinkle.jump();
+        }
+        else if(key==Config.MoveRight)
+        {
+            wrinkle.goRight();
+        }
+        else if(key==Config.MoveLeft)
+        {
+            wrinkle.goLeft();
+        }
+        else if(key==Config.BreatheFire)
+        {
+            wrinkle.breatheFire();
         }
     }
 
     public void keyReleased(KeyEvent e)
     {
         int key=e.getKeyCode();
-        switch(key)
+
+        if(key==Config.MoveRight)
         {
-            case KeyEvent.VK_D:
-                wrinkle.unGoRight();
-                break;
-        
-            case KeyEvent.VK_A:
-                wrinkle.unGoLeft();
-                break;
+            wrinkle.unGoRight();
+        }
+        else if(key==Config.MoveLeft)
+        {
+            wrinkle.unGoLeft();
+        }
+        else if(key==Config.BreatheFire)
+        {
+            wrinkle.unBreatheFire();
         }
     }
 
@@ -157,7 +159,7 @@ public class Game extends JPanel implements KeyListener {
 
            if(x>=0)
            {
-               x=x-Global.WinX;
+               x-=Global.WinX;
            }
            at.setToTranslation(x,y);
            buffg.setTransform(at);

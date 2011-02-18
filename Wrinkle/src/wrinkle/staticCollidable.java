@@ -9,6 +9,6 @@ package wrinkle;
  *
  * @author alex
  */
-abstract public class staticCollidable extends Collidable {
+abstract public class StaticCollidable extends Collidable {
 
 }
