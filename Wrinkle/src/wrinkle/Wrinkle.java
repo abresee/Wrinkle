@@ -69,7 +69,7 @@ public final class Wrinkle extends Actor {
 
     final void initWrinkleImages()
     {
-        String prefix="Data/images/hero/";
+        String prefix="Data/images/hero/dragon/";
         dragonRightWalk=new BufferedImage[Global.framecount];
         dragonLeftWalk=new BufferedImage[Global.framecount];
         try

@@ -16,22 +16,31 @@ import java.awt.Insets;
 public class Main {  
     
     public static void main(String[] args) {
-        JFrame window=new JFrame("Wrinkle... th-t-the Dinosaur!");
-
-        Game g=new Game();
         
-        window.addKeyListener(g);
-        window.add(g);
-        window.getContentPane().add(g);
-        window.setSize(Global.WinX,Global.WinY);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setVisible(true);
-        Insets off=window.getInsets();
-        int xoff=off.left+off.right;
-        int yoff=off.top+off.bottom;
-        window.setSize(Global.WinX+xoff, Global.WinY+yoff);
+    JFrame window=new JFrame("Wrinkle... th-t-the Dinosaur!");
+       Game g;
+       do {
+                    
+            g=new Game();
 
-        while(g.loop()){}
+            window.addKeyListener(g);
+            window.add(g);
+            window.getContentPane().add(g);
+            window.setSize(Global.WinX,Global.WinY);
+            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            window.setVisible(true);
+            Insets off=window.getInsets();
+            int xoff=off.left+off.right;
+            int yoff=off.top+off.bottom;
+            window.setSize(Global.WinX+xoff, Global.WinY+yoff);
+            window.validate();
+            if(!g.loop())
+            {
+                break;
+            }
+            window.removeAll();
+            System.out.println("lmao");
+            } while(true);
     }
 
 }

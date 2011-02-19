@@ -4,7 +4,6 @@
  */
 
 package wrinkle;
-import java.awt.Graphics2D;
 /**
  *
  * @author a.bresee
@@ -12,17 +11,12 @@ import java.awt.Graphics2D;
 public class DieBox extends Terrain {
     DieBox(int x_, int y_,int width, int height)
     {
-        super(y_, y_, width, height);
+        super(x_, y_, width, height);
     }
-    @Override
-    void draw(Graphics2D g){}
+    //@Override
+    
 
-    @Override
-    boolean isDeadly()
-    {
-        System.out.println("LMAO");
-        return true;
-    }
+    
 
 
 }

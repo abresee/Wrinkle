@@ -204,7 +204,6 @@ void tryMoveX(float delx, GameObjects go) throws DeadException
                 break;
             }
         }
-        System.out.println(go.getDieBoxes().size());
         for(DieBox i:go.getDieBoxes())
          {
              if(collidesWith(i))

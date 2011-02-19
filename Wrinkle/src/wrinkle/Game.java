@@ -104,6 +104,15 @@ public class Game extends JPanel implements KeyListener {
 
     }
 
+    @Override
+    public void paint(Graphics g)
+    {
+
+        Graphics2D g1=(Graphics2D)g;
+        g1.setBackground(Color.CYAN);
+        g1.clearRect(0, 0, Global.WinX, Global.WinY);
+        g1.drawImage(buff, null, 0, 0);
+    }
     public void keyPressed(KeyEvent e)
     {
         int key=e.getKeyCode();
@@ -188,10 +197,7 @@ public class Game extends JPanel implements KeyListener {
     
     drawBackground();
     drawToForeground();
-    panel=(Graphics2D)this.getGraphics();
-    panel.setBackground(Color.CYAN);
-    //panel.clearRect(0, 0, Global.WinX, Global.WinY);
-    panel.drawImage(buff,0,0, this);
+    paintImmediately(0,0,Global.WinX,Global.WinY);
     }
     boolean loop()
     {
@@ -206,6 +212,7 @@ public class Game extends JPanel implements KeyListener {
            }
             catch(DeadException e)
             {
+                this.dispose();
                 return true;
             }
             
