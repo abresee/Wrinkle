@@ -48,14 +48,14 @@ public class Game extends JPanel implements KeyListener {
 
     public Game()
     {
-        try{
-        bgm=Global.makeClip("Data/audio/bgm.wav");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        bgm.loop(Clip.LOOP_CONTINUOUSLY);
+//        try{
+//        bgm=Global.makeClip("Data/audio/bgm.wav");
+//        }
+//        catch(Exception e)
+//        {
+//            e.printStackTrace();
+//        }
+//        bgm.loop(Clip.LOOP_CONTINUOUSLY);
         setIgnoreRepaint(true);
         addKeyListener(this);
         setFocusable(true);

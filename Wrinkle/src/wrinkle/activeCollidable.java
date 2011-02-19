@@ -9,7 +9,7 @@ import java.awt.geom.*;
  *
  * @author alex
  */
-abstract public class ActiveCollidable extends Collidable {
+abstract class ActiveCollidable extends Collidable {
 
     /** x velocity */
     float velX;
