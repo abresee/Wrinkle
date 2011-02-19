@@ -56,4 +56,8 @@ public class Terrain extends StaticCollidable
        color=c;
        collideShape=new Rectangle2D.Float(x,y,width,height);
    }
+   boolean isDeadly()
+   {
+       return false;
+   }
 }

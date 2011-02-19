@@ -31,8 +31,7 @@ public class Main {
         int yoff=off.top+off.bottom;
         window.setSize(Global.WinX+xoff, Global.WinY+yoff);
 
-
-        g.loop();
+        while(g.loop()){}
     }
 
 }

@@ -86,18 +86,16 @@ public class Game extends JPanel implements KeyListener {
 
         wrinkle=new Wrinkle(Global.WinX/4+1,Global.WinY-200);
 
-        gameObjects.add(new Terrain(0,Global.WinY-200+wrinkle.getHeight(),
+        gameObjects.add(new Terrain(0,Global.GroundLevel,
                             400,400,Color.GREEN));
-        gameObjects.add(new Terrain(500,Global.WinY-200+wrinkle.getHeight(),
-                            300,400,Color.RED));
+        
+        gameObjects.add(new DieBox(0,Global.WinY,Global.WinX,Global.WinY));
+        gameObjects.add(new Terrain(500,Global.GroundLevel,300,400,Color.RED));
         gameObjects.add(new Terrain(300,400,100,100));
         gameObjects.add(new Terrain(200,200,50,50));
-        gameObjects.add(new Terrain(Global.WinX,Global.WinY-200+wrinkle.getHeight(),
-                            400,400,Color.MAGENTA));
-        gameObjects.add(new Terrain(1200,Global.WinY-200+wrinkle.getHeight(),
-                            400,400,Color.GREEN));
-        gameObjects.add(new Terrain(1800,Global.WinY-200+wrinkle.getHeight(),
-                            400,400,Color.GREEN));
+        gameObjects.add(new Terrain(Global.WinX,Global.GroundLevel,400,400,Color.MAGENTA));
+        gameObjects.add(new Terrain(1200,Global.GroundLevel,400,400,Color.GREEN));
+        gameObjects.add(new Terrain(1800,Global.GroundLevel,400,400,Color.GREEN));
         gameObjects.add(new Bird(600,0));
     }
 
@@ -182,7 +180,7 @@ public class Game extends JPanel implements KeyListener {
 
     }
 
-    void go()
+    void go() throws DeadException
     {
     
     gameObjects.update();    
@@ -195,14 +193,21 @@ public class Game extends JPanel implements KeyListener {
     //panel.clearRect(0, 0, Global.WinX, Global.WinY);
     panel.drawImage(buff,0,0, this);
     }
-    void loop()
+    boolean loop()
     {
         System.out.println("game start");
        while(running)
        {
             long time=System.currentTimeMillis();
 
-            go();
+            try
+            {
+                go();
+           }
+            catch(DeadException e)
+            {
+                return true;
+            }
             
             time=System.currentTimeMillis()-time;
             //System.out.println("time elapsed on that frame: "+time);
@@ -218,7 +223,7 @@ public class Game extends JPanel implements KeyListener {
                     e.printStackTrace();
                 }
            }
-            
         }
+        return false;
     }
 }

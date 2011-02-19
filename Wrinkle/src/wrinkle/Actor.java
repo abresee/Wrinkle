@@ -42,12 +42,11 @@ public abstract class Actor extends ActiveCollidable{
     protected  Clip walk2;
     protected  Clip land;
 
-    void hurt()
+    void hurt() throws DeadException
     {
         if(health>0)
         {
             --health;
-        System.out.println("bird hurt");
         }
         else
         {
@@ -133,20 +132,16 @@ public abstract class Actor extends ActiveCollidable{
         }
     }
 
-    boolean roar(Actor a)
-    {
-        return true;
-    }
+    
 
     void handleTerrainCollisionX(Terrain i)
     {
          setXtoEdge(i);
     }
 
-    void handleActorCollisionX(Actor i)
+    void handleActorCollisionX(Actor i) 
     {
-         if(roar(i))
-            setXtoEdge(i);
+         setXtoEdge(i);
     }
     
     void setXtoEdge(Collidable i)

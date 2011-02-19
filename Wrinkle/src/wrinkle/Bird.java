@@ -23,7 +23,7 @@ public final class Bird extends Enemy
         health=3;
         curSprite=leftIdle;
     }
-   void update(GameObjects go)
+   void update(GameObjects go) throws DeadException
     {
         jump();
         super.update(go);

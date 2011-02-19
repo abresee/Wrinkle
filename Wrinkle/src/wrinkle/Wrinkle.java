@@ -12,6 +12,9 @@ import java.awt.PointerInfo;
 import java.awt.Point;
 import java.awt.Graphics2D;
 import java.util.LinkedList;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
 
 /**
  * Class that defines the player character
@@ -22,6 +25,15 @@ public final class Wrinkle extends Actor {
    private boolean biting;
    private boolean breathingFire;
 
+
+   private BufferedImage leftBite[];
+   private BufferedImage rightBite[];
+   private BufferedImage dragonRightWalk[];
+   private BufferedImage dragonLeftWalk[];
+   private BufferedImage dragonRightIdle;
+   private BufferedImage dragonLeftIdle;
+   private BufferedImage dragonRightJump;
+   private BufferedImage dragonLeftJump;
 
    private LinkedList<Fire> fireList;
    private final Object fireListLock;
@@ -49,36 +61,50 @@ public final class Wrinkle extends Actor {
         fireList=new LinkedList<Fire>();
         fireListLock=new Object();
         mass = 1;
-        m=JobMode.normal;
+        m=JobMode.dragon;
         biting=false;
         breathingFire=false;
         health=3;
     }
 
+    final void initWrinkleImages()
+    {
+        String prefix="Data/images/hero/";
+        dragonRightWalk=new BufferedImage[Global.framecount];
+        dragonLeftWalk=new BufferedImage[Global.framecount];
+        try
+        {
+            dragonRightIdle=ImageIO.read(new File(prefix+"rightidle.png"));
+            dragonLeftIdle=ImageIO.read(new File(prefix+"leftidle.png"));
+            String name="rightwalk";
+
+            for(int i=0;i<Global.framecount;++i)
+            {
+              dragonRightWalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
+            }
+
+            name="leftwalk";
+            for(int i=0;i<Global.framecount;++i)
+            {
+                dragonLeftWalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
+            }
+
+            dragonRightJump=ImageIO.read(new File(prefix+"rightjump.png"));
+            dragonLeftJump=ImageIO.read(new File(prefix+"leftjump.png"));
+
+        }
+        catch(Exception e){e.printStackTrace();}
+    }
+    
     /**
      *Defines behavior of "jump" action. Called when player jumps.
      */
-    void hurt()
-    {
-        if (health>0)
-        {
-            --health;
-        }
-        else
-        {
-            die();
-        }
 
-    }
-    void die()
+    @Override
+    void die() throws DeadException
     {
-        velX=0;
-        velY=0;
-        accelX=0;
-        accelY=0;
-        onTheGround=false;
-        ignoreCollision=true;
-        
+        System.out.println("dead");
+        throw new DeadException();
     }
 
    
@@ -183,7 +209,7 @@ public final class Wrinkle extends Actor {
     }
 
     @Override
-    void update(GameObjects go)
+    void update(GameObjects go) throws DeadException
     {
         super.update(go);
         if(breathingFire)
@@ -219,20 +245,36 @@ public final class Wrinkle extends Actor {
         }
         
     }
-
-    @Override
-    boolean roar(Actor a)
+@Override
+void updateAnim()
     {
-        if (this.isFacing(a))
+         if (state=="running")
         {
-         if(biting)
-         {
-            a.hurt();
-            return false;
-         }
+            if (timecount == frametime)
+            {
+                timecount = 0;
+                if (frame % 2 == 0)
+                {
+                    playClip(walk1);
+                } else
+                {
+                    playClip(walk2);
+                }
+                curSprite = (facingLeft) ? leftWalk[frame] : rightWalk[frame];
+                frame =(frame < Global.framecount - 1) ? (frame + 1) : 0;
+            }
+            else
+            {
+                ++timecount;
+            }
         }
-        return true;
+         else if(state=="idle")
+         {
+                 curSprite = (facingLeft) ? leftIdle : rightIdle;
+         }
+         else if(state=="jumping")
+         {
+             curSprite = (facingLeft) ? leftJump : rightJump;
+         }
     }
-   
-    
 }

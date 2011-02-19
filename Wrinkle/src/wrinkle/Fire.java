@@ -60,7 +60,7 @@ public final class Fire extends ActiveCollidable{
     }
 
     @Override
-    void update(GameObjects go)
+    void update(GameObjects go) throws DeadException
     {
        // System.out.println("fire x: "+x+"\nfire y: "+y);
         super.update(go);
@@ -98,10 +98,10 @@ public final class Fire extends ActiveCollidable{
     {
     die();
     }
-    void handleActorCollisionX(Actor i)
+    void handleActorCollisionX(Actor i) throws DeadException
     {
-    i.hurt();
-    die();
+        i.hurt();
+        die();
     }
     void handleTerrainCollisionY(Terrain i){}
     void handleActorCollisionY(Actor i){}

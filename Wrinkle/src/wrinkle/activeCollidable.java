@@ -75,7 +75,8 @@ abstract public class ActiveCollidable extends Collidable {
         facingLeft=false;
         dead=false;
     }
-void generateBoundingBox()
+    @Override
+    void generateBoundingBox()
     {
       collideShape=new Rectangle2D.Float(x,y,curSprite.getWidth(),curSprite.getHeight());
     }
@@ -97,18 +98,20 @@ void generateBoundingBox()
     }
 
     /////////////////GETTERS///////////////////////////
+    @Override
     int getHeight()
     {
         return curSprite.getHeight();
     }
-
+    @Override
     int getWidth()
     {
         return curSprite.getWidth();
     }
+    @Override
     public Rectangle2D getbBox(){return collideShape;}
 
-    void die()
+    void die() throws DeadException
     {
         dead=true;
     }
@@ -123,15 +126,21 @@ void generateBoundingBox()
         boolean b=collideShape.intersects(c.getbBox());
         return b;
     }
-     void update(GameObjects go)
+     void update(GameObjects go) throws DeadException
     {
 
         updateVel();
         float dely = velY * Global.timeStep;
+        try{
         tryMoveY(dely,go);
         
         float delx = velX * Global.timeStep;
         tryMoveX(delx,go);
+        }
+        catch (DeadException e)
+        {
+            throw e;
+        }
 
        
 
@@ -143,7 +152,7 @@ void generateBoundingBox()
 
     }
 
-void tryMoveX(float delx, GameObjects go)
+void tryMoveX(float delx, GameObjects go) throws DeadException
     {
          x+=delx;
 
@@ -153,9 +162,19 @@ void tryMoveX(float delx, GameObjects go)
              {
                  if(collidesWith(i))
                  {
-                    handleTerrainCollisionX(i);
+                    
+                        
+                    
+                     handleTerrainCollisionX(i);
 
                  }
+             }
+         }
+         for(DieBox i:go.getDieBoxes())
+         {
+             if(collidesWith(i))
+             {
+                 die();
              }
          }
          for(Actor i:go.getActors())
@@ -164,13 +183,14 @@ void tryMoveX(float delx, GameObjects go)
                  continue;
              else if(collidesWith(i))
              {
-                handleActorCollisionX(i);
+                 handleActorCollisionX(i);
+               
              }
          }
     }
 
 
- void tryMoveY(float delY, GameObjects go)
+ void tryMoveY(float delY, GameObjects go) throws DeadException
     {
          boolean bk = false;
          y+=delY;
@@ -178,11 +198,20 @@ void tryMoveX(float delx, GameObjects go)
         {
             if (collidesWith(i))
             {
+                
                 handleTerrainCollisionY(i);
                 bk=true;
                 break;
             }
         }
+        System.out.println(go.getDieBoxes().size());
+        for(DieBox i:go.getDieBoxes())
+         {
+             if(collidesWith(i))
+             {
+                 die();
+             }
+         }
         for (Actor i:go.getActors())
         {
             if(this.equals(i))
@@ -200,9 +229,9 @@ void tryMoveX(float delx, GameObjects go)
     }
 
      abstract void handleTerrainCollisionX(Terrain i);
-     abstract void handleActorCollisionX(Actor i);
+     abstract void handleActorCollisionX(Actor i) throws DeadException;
      abstract void handleTerrainCollisionY(Terrain i);
-     abstract void handleActorCollisionY(Actor i);
+     abstract void handleActorCollisionY(Actor i) throws DeadException;
      abstract void updateVel();
      abstract void updateState();
      abstract void updateAnim();

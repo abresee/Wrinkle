@@ -5,9 +5,9 @@
 
 package wrinkle;
 
-import java.util.ArrayList;
 import java.awt.Graphics2D;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 /**
  *
@@ -15,25 +15,28 @@ import java.util.List;
  */
 class GameObjects
 {
-    private ArrayList<Terrain> terrains;
-    private ArrayList<Actor> actors;
+    private LinkedList<Terrain> terrains;
+    private LinkedList<Actor> actors;
+    private LinkedList<DieBox> dieboxes;
 
     GameObjects()
     {
-        terrains=new ArrayList<Terrain>();
-        actors=new ArrayList<Actor>();
+        terrains=new LinkedList<Terrain>();
+        actors=new LinkedList<Actor>();
+        dieboxes=new LinkedList<DieBox>();
     }
-
     void add(Terrain t)
     {
         terrains.add(t);
     }
-
     void add(Actor a)
     {
         actors.add(a);
     }
-
+    void add(DieBox d)
+    {
+        dieboxes.add(d);
+    }
     List<Terrain> getTerrains()
     {
         return Collections.unmodifiableList(terrains);
@@ -42,6 +45,10 @@ class GameObjects
     List<Actor> getActors()
     {
         return Collections.unmodifiableList(actors);
+    }
+    List<DieBox> getDieBoxes()
+    {
+        return Collections.unmodifiableList(dieboxes);
     }
 
     void draw(Graphics2D g)
@@ -55,15 +62,15 @@ class GameObjects
             i.draw(g);
         }
     }
-    void update()
+    void update() throws DeadException
     {
-        ArrayList<Actor> newActors=new ArrayList<Actor>();
+        LinkedList<Actor> newActors=new LinkedList<Actor>();
         for(Actor i:actors)
         {
             if(!i.isDead())
             {
-            i.update(this);
-            newActors.add(i);
+                i.update(this);
+                newActors.add(i);
             }
         }
         actors=newActors;
