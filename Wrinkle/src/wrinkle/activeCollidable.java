@@ -5,12 +5,16 @@
 
 package wrinkle;
 import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
 /**
  *
  * @author alex
  */
 abstract class ActiveCollidable extends Collidable {
-
+    
+    
+    protected BufferedImage curSprite;
     /** x velocity */
     float velX;
     /** y velocity */
@@ -75,11 +79,7 @@ abstract class ActiveCollidable extends Collidable {
         facingLeft=false;
         dead=false;
     }
-    @Override
-    void generateBoundingBox()
-    {
-      collideShape=new Rectangle2D.Float(x,y,curSprite.getWidth(),curSprite.getHeight());
-    }
+    
      final void initPhys(float X, float Y, float velX_, float velY_,
                         float accelX_, float accelY_)
     {
@@ -98,17 +98,24 @@ abstract class ActiveCollidable extends Collidable {
     }
 
     /////////////////GETTERS///////////////////////////
-    @Override
     int getHeight()
     {
         return curSprite.getHeight();
     }
-    @Override
     int getWidth()
     {
         return curSprite.getWidth();
     }
-    @Override
+
+
+     void draw(Graphics2D g)
+    {
+        g.drawImage(curSprite, Math.round(x), Math.round(y), null);
+    }
+   void generateBoundingBox()
+    {
+      collideShape=new Rectangle2D.Float(x,y,curSprite.getWidth(),curSprite.getHeight());
+    }
     public Rectangle2D getbBox(){return collideShape;}
 
     void die() throws DeadException
@@ -224,6 +231,7 @@ void tryMoveX(float delx, GameObjects go) throws DeadException
         }
         if (!bk) {
             ignoreCollision = false;
+            onTheGround=false;
         }
     }
 

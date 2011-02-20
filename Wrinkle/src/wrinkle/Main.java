@@ -19,11 +19,10 @@ public class Main {
         
     JFrame window=new JFrame("Wrinkle... th-t-the Dinosaur!");
        Game g;
-       do {
+       
                     
             g=new Game();
 
-            window.addKeyListener(g);
             window.add(g);
             window.getContentPane().add(g);
             window.setSize(Global.WinX,Global.WinY);
@@ -34,13 +33,12 @@ public class Main {
             int yoff=off.top+off.bottom;
             window.setSize(Global.WinX+xoff, Global.WinY+yoff);
             window.validate();
-            if(!g.loop())
-            {
-                break;
-            }
-            window.removeAll();
-            System.out.println("lmao");
-            } while(true);
+            window.addKeyListener(g);
+            window.addMouseMotionListener(g);
+            do{
+                
+            }while(g.go());
+            
     }
 
 }

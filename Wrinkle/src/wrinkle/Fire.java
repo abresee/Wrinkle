@@ -21,19 +21,15 @@ public final class Fire extends ActiveCollidable{
 
     private static boolean spriteInit=false;
    
-    Fire(float X, float Y, float velX_, float velY_)
-    {
-        super(X,Y,velX_, velY_,0,0);
-    }
+   
 
-    Fire(float X, float Y, float velX_, float velY_, double angle_)
+    Fire(float X, float Y, float mag, float angle_)
     {
-        this(X,Y,velX_,velY_);
+       
+        super(X, Y, (float)(mag*Math.cos(angle_)), (float)(mag*Math.sin(angle_)), 0.0f, 0.0f);
         angle=angle_;
         initImages();
         //scaleFactor=.5f;
-
-        System.out.println(angle);
         Graphics2D g=curSprite.createGraphics();
         g.rotate(angle,FireSprite.getWidth()/2,FireSprite.getHeight()/2);
         g.drawImage(FireSprite,0,0,null);
@@ -52,7 +48,8 @@ public final class Fire extends ActiveCollidable{
            }
            spriteInit=true;
         }
-
+        x-=FireSprite.getWidth();
+        y-=FireSprite.getHeight();
         
        curSprite = new BufferedImage(FireSprite.getWidth(),
                        FireSprite.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
@@ -62,7 +59,7 @@ public final class Fire extends ActiveCollidable{
     @Override
     void update(GameObjects go) throws DeadException
     {
-       // System.out.println("fire x: "+x+"\nfire y: "+y);
+       // e.println("fire x: "+x+"\nfire y: "+y);
         super.update(go);
         if((x-Global.OffsetX>Global.WinX)||x-Global.OffsetX<0
                 ||(y-Global.OffsetY>Global.WinY)||(y-Global.OffsetY)<0)

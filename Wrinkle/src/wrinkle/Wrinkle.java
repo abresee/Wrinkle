@@ -26,17 +26,14 @@ public final class Wrinkle extends Actor {
    private boolean breathingFire;
 
 
-   private BufferedImage leftBite[];
-   private BufferedImage rightBite[];
-   private BufferedImage dragonRightWalk[];
-   private BufferedImage dragonLeftWalk[];
-   private BufferedImage dragonRightIdle;
-   private BufferedImage dragonLeftIdle;
-   private BufferedImage dragonRightJump;
-   private BufferedImage dragonLeftJump;
-
+   private AnimationSet d;
+   
    private LinkedList<Fire> fireList;
    private final Object fireListLock;
+
+   private Point mouseLoc;
+
+   private final Object lock;
 
     /**
      *Enum to flag what 'copy mode' wrinkle is using
@@ -58,6 +55,8 @@ public final class Wrinkle extends Actor {
      */
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
+        d=new AnimationSet("hero/dragon");
+        currentSet=d;
         fireList=new LinkedList<Fire>();
         fireListLock=new Object();
         mass = 1;
@@ -65,37 +64,10 @@ public final class Wrinkle extends Actor {
         biting=false;
         breathingFire=false;
         health=3;
+        lock = new Object();
+        mouseLoc = new Point();
     }
 
-    final void initWrinkleImages()
-    {
-        String prefix="Data/images/hero/dragon/";
-        dragonRightWalk=new BufferedImage[Global.framecount];
-        dragonLeftWalk=new BufferedImage[Global.framecount];
-        try
-        {
-            dragonRightIdle=ImageIO.read(new File(prefix+"rightidle.png"));
-            dragonLeftIdle=ImageIO.read(new File(prefix+"leftidle.png"));
-            String name="rightwalk";
-
-            for(int i=0;i<Global.framecount;++i)
-            {
-              dragonRightWalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
-            }
-
-            name="leftwalk";
-            for(int i=0;i<Global.framecount;++i)
-            {
-                dragonLeftWalk[i]=ImageIO.read(new File(prefix+name+i+".png"));
-            }
-
-            dragonRightJump=ImageIO.read(new File(prefix+"rightjump.png"));
-            dragonLeftJump=ImageIO.read(new File(prefix+"leftjump.png"));
-
-        }
-        catch(Exception e){e.printStackTrace();}
-    }
-    
     /**
      *Defines behavior of "jump" action. Called when player jumps.
      */
@@ -112,11 +84,22 @@ public final class Wrinkle extends Actor {
      *Defines behavior of "right" action. Called when player presses the 
      *"right" key.
      */
+    boolean isBreathingFire()
+    {
+        return breathingFire;
+    }
+    void setMouseLoc(Point p)
+    {
+        synchronized(lock)
+        {
+        mouseLoc=p;
+        }
+    }
+
     void goRight()
     {
         if (!goingRight)
         {
-            curSprite = rightWalk[0];
             frame = 0;
             timecount = 0;
             facingLeft = false;
@@ -140,7 +123,6 @@ public final class Wrinkle extends Actor {
     void goLeft()
     {
         if (!goingLeft) {
-            curSprite = leftWalk[0];
             frame = 0;
             timecount = 0;
             facingLeft = true;
@@ -183,21 +165,25 @@ public final class Wrinkle extends Actor {
     }
     void fire()
     {
-        PointerInfo a = MouseInfo.getPointerInfo();
-        Point b  = a.getLocation();
-        double x_ = b.getX();
-        double y_ = b.getY();
-        double delx = x_-(x-Global.OffsetX);
-        double dely = y_-(y-Global.OffsetY);
+        double x_;
+        double y_;
+       synchronized(lock)
+       {
+        x_ = mouseLoc.getX()+Global.OffsetX;
+        y_ = mouseLoc.getY()+Global.OffsetY;
+       }
+        double spawnX=x-10+((facingLeft)?0:getWidth());
+        double spawnY=y+10;
+        
+        double delx = x_-(spawnX);
+        double dely = y_-(spawnY);
 
         double angle=Math.atan2(dely,delx);
-        //double mag=Math.sqrt(delx*delx+dely*dely);
-        float velx_=(float)Math.cos(angle);
-        float vely_=(float)Math.sin(angle);
+       // double mag=Math.sqrt(delx*delx+dely*dely);
+        
 
-        System.out.println("angle: "+angle+"\nvely: "+vely_+"\nvelx: "+velx_);
 
-        fireList.add(new Fire(x+getWidth()-5,y+12,velx_+velX,vely_+velY,angle));
+        fireList.add(new Fire((float)spawnX,(float)spawnY,(float)1,(float)angle));
     }
     void breatheFire()
     {
@@ -230,7 +216,6 @@ public final class Wrinkle extends Actor {
         fireList=bab2;
         
         correctOffsets();
-        //System.out.println("wrinkle x: "+x+"\nwrinkle y: "+y);
     }
     @Override
     void draw(Graphics2D g)
@@ -243,38 +228,19 @@ public final class Wrinkle extends Actor {
                 i.draw(g);
             }
         }
-        
     }
-@Override
-void updateAnim()
+    @Override
+    void updateState()
     {
-         if (state=="running")
+        super.updateState();
+        if(breathingFire)
         {
-            if (timecount == frametime)
-            {
-                timecount = 0;
-                if (frame % 2 == 0)
-                {
-                    playClip(walk1);
-                } else
-                {
-                    playClip(walk2);
-                }
-                curSprite = (facingLeft) ? leftWalk[frame] : rightWalk[frame];
-                frame =(frame < Global.framecount - 1) ? (frame + 1) : 0;
-            }
-            else
-            {
-                ++timecount;
-            }
+            state=State.action;
         }
-         else if(state=="idle")
-         {
-                 curSprite = (facingLeft) ? leftIdle : rightIdle;
-         }
-         else if(state=="jumping")
-         {
-             curSprite = (facingLeft) ? leftJump : rightJump;
-         }
+    }
+    @Override
+    void updateAnim()
+    {
+        super.updateAnim();
     }
 }

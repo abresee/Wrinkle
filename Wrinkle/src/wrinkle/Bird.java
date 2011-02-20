@@ -21,7 +21,6 @@ public final class Bird extends Enemy
     {
         super("bird",X,Y);
         health=3;
-        curSprite=leftIdle;
     }
    void update(GameObjects go) throws DeadException
     {
