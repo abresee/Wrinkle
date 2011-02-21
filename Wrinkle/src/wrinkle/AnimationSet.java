@@ -24,7 +24,10 @@ public class AnimationSet {
     protected BufferedImage leftIdle;
     protected BufferedImage rightJump;
     protected BufferedImage leftJump;
+    private int walkFrame=0;
+    private int actionFrame=0;
 
+    
      AnimationSet(String str)
     {
         String prefix="Data/images/"+str+"/";
@@ -41,7 +44,6 @@ public class AnimationSet {
 
             for(int i=0;i<Global.framecount;++i)
             {
-              System.out.println(prefix+name+"action"+i+".png");
               rightWalk.add(ImageIO.read(new File(prefix+name+"walk"+i+".png")));
               rightAction.add(ImageIO.read(new File(prefix+name+"action"+i+".png")));
             }
@@ -59,36 +61,29 @@ public class AnimationSet {
         }
         catch(Exception e){e.printStackTrace();}
     }
-    List<BufferedImage> getRightWalk()
-     {
-         return Collections.unmodifiableList(rightWalk);
-     }
-    List<BufferedImage> getLeftWalk()
-    {
-        return Collections.unmodifiableList(leftWalk);
-    }
-    BufferedImage getRightIdle()
-    {
-        return rightIdle;
-    }
-    BufferedImage getLeftIdle()
-    {
-        return leftIdle;
-    }
-    BufferedImage getLeftJump()
-    {
-        return leftJump;
-    }
-    BufferedImage getRightJump()
-    {
-        return rightJump;
-    }
-    List<BufferedImage> getRightAction()
-    {
-        return Collections.unmodifiableList(rightAction);
-    }
-    List<BufferedImage> getLeftAction()
-    {
-        return Collections.unmodifiableList(leftAction);
-    }
+   BufferedImage getNextSprite(State s, boolean facingLeft)
+   {
+       BufferedImage bi=leftIdle;
+       switch(s)
+       {
+           case running:
+               bi=(facingLeft)
+                 ?leftWalk.get((walkFrame++)%leftWalk.size())
+                 :rightWalk.get((walkFrame++)%rightWalk.size());
+
+               break;
+           case jumping:
+               bi=(facingLeft)?leftJump:rightJump;
+               break;
+           case idle:
+               bi=(facingLeft)?leftIdle:rightIdle;
+               break;
+           case action:
+               bi=(facingLeft)
+                 ?leftAction.get((actionFrame++)%leftAction.size())
+                 :rightAction.get((actionFrame++)%rightAction.size());
+               break;
+       }
+       return bi;
+   }
 }

@@ -13,6 +13,11 @@ import javax.sound.sampled.*;
 import java.awt.geom.*;
 import java.awt.Graphics2D;
 
+
+enum State {
+
+        running, jumping, idle, action, sleeping
+    };
 /**
  * Abstract superclass of game actors -- that is, objects that have animations,
  * sounds, etc. 
@@ -20,12 +25,11 @@ import java.awt.Graphics2D;
  */
 public abstract class Actor extends ActiveCollidable {
 
-    protected enum State {
-
-        running, jumping, idle, action
-    };
+    
     protected State state;
     protected int health;
+    protected boolean invulnerable;
+    protected int invulnCount;
     /**set to false if sound initialization doesn't complete*/
     private boolean soundImplemented;
     AnimationSet normal;
@@ -36,10 +40,15 @@ public abstract class Actor extends ActiveCollidable {
     protected Clip land;
 
     void hurt() throws DeadException {
-        if (health > 0) {
-            --health;
-        } else {
-            die();
+        if(!invulnerable)
+        {
+            if (health > 0) {
+                --health;
+                invulnerable=true;
+                invulnCount++;
+            } else {
+                die();
+            }
         }
     }
 
@@ -54,7 +63,8 @@ public abstract class Actor extends ActiveCollidable {
         normal = new AnimationSet(str);
         currentSet = normal;
         initSounds(str);
-        curSprite = currentSet.getLeftIdle();
+        state=State.idle;
+        curSprite = currentSet.getNextSprite(state, facingLeft);
 
 
     }
@@ -85,7 +95,14 @@ public abstract class Actor extends ActiveCollidable {
             onTheGround = false;
         }
     }
-
+    @Override
+    void draw(Graphics2D g)
+    {
+    if(invulnCount%3==0)
+        {
+        super.draw(g);
+        }
+    }
     void handleTerrainCollisionX(Terrain i) {
         setXtoEdge(i);
     }
@@ -117,7 +134,7 @@ public abstract class Actor extends ActiveCollidable {
         }
     }
 
-    void handleActorCollisionY(Actor i) {
+    void handleActorCollisionY(Actor i) throws DeadException {
         if (y < i.getY()) {
             if (!ignoreCollision) {
                 if (!onTheGround) {
@@ -129,7 +146,7 @@ public abstract class Actor extends ActiveCollidable {
             }
 
         } else {
-            ignoreCollision = true;
+            hurt();
         }
     }
 
@@ -143,47 +160,20 @@ public abstract class Actor extends ActiveCollidable {
         } else {
             state = State.jumping;
         }
+        if(invulnerable)
+        {
+            if(invulnCount++%40==0)
+            {
+                invulnCount=0;
+                invulnerable=false;
+            }
+        }
     }
 
     void updateAnim() {
-        switch (state) {
-            case running:
-                if (timecount == frametime) {
-                    timecount = 0;
-                    if (frame % 2 == 0) {
-                        playClip(walk1);
-                    } else {
-                        playClip(walk2);
-                    }
-                    curSprite = (facingLeft)
-                            ? currentSet.getLeftWalk().get(frame)
-                            : currentSet.getRightWalk().get(frame);
-                    frame = (frame < Global.framecount - 1) ? (frame + 1) : 0;
-                } else {
-                    ++timecount;
-                }
-                break;
-            case idle:
-                curSprite = (facingLeft)
-                        ? currentSet.getLeftIdle()
-                        : currentSet.getRightIdle();
-                break;
-            case jumping:
-                curSprite = (facingLeft)
-                        ? currentSet.getLeftJump()
-                        : currentSet.getRightJump();
-                break;
-            case action:
-                if(timecount==frametime)
-                {
-                curSprite = (facingLeft)
-                          ? currentSet.getLeftAction().get(frame)
-                          : currentSet.getRightAction().get(frame);
-                frame = (frame < Global.framecount - 1) ? (frame + 1) : 0;
-                }
-                else{
-                    ++timecount;
-                }
+        if(frame++%frameTime==0)
+        {
+        curSprite=currentSet.getNextSprite(state,facingLeft);
         }
     }
 

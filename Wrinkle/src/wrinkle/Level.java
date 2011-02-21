@@ -78,7 +78,8 @@ public class Level{
         gameObjects.add(new Terrain(Global.WinX, Global.GroundLevel, 400, 400, Color.MAGENTA));
         gameObjects.add(new Terrain(1200, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Terrain(1800, Global.GroundLevel, 400, 400, Color.GREEN));
-        gameObjects.add(new Bird(600, 0));
+        gameObjects.add(new Bird(wrinkle, 600, 300));
+        gameObjects.add(new Dragon(wrinkle,1200,Global.GroundLevel));
     }
 
     Wrinkle getWrinkle()

@@ -25,8 +25,6 @@ public class Menu extends JPanel implements KeyListener, MouseInputListener
     {
 
     }
-
-
     public void mouseClicked(MouseEvent e)
     {
 

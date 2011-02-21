@@ -9,15 +9,20 @@ package wrinkle;
  * Class defining the Dragon enemy
  * @author a.bresee
  */
-public final class Dragon  extends Enemy{
+public final class Dragon extends Enemy{
 
-    Dragon()
+    
+    Dragon(Wrinkle wrinkle, int X, int Y)
     {
-        this(0,0);
+        super(wrinkle, "dragon",X,Y);
     }
-    Dragon(int X, int Y)
+    protected void idleScript()
     {
-        super("dragon",X,Y);
+
+    }
+    protected void activeScript()
+    {
+        
     }
    
 }

@@ -25,9 +25,9 @@ public final class Fire extends ActiveCollidable{
 
     Fire(float X, float Y, float mag, float angle_)
     {
-       
         super(X, Y, (float)(mag*Math.cos(angle_)), (float)(mag*Math.sin(angle_)), 0.0f, 0.0f);
         angle=angle_;
+
         initImages();
         //scaleFactor=.5f;
         Graphics2D g=curSprite.createGraphics();

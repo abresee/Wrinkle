@@ -16,53 +16,53 @@ abstract class ActiveCollidable extends Collidable {
     
     protected BufferedImage curSprite;
     /** x velocity */
-    float velX;
+    protected float velX;
     /** y velocity */
-    float velY;
+    protected float velY;
     /** x acceleration*/
-    float accelX;
+    protected float accelX;
     /** y acceleration*/
-    float accelY;
+    protected float accelY;
     /** maximum x velocity -- velX is capped at this value*/
-    float maxVelX;
+    protected float maxVelX;
     /** maximum y velocity -- velY is capped at this value*/
-    float maxVelY;
+    protected float maxVelY;
 
     /** how much the collidable moved this frame - x */
-    float delX;
+    protected float delX;
     /** how much the collidable moved this frame - y */
-    float delY;
+    protected float delY;
 
     /**
      *Currently unused - mass for calculating momentum changes in collisions
      */
-    float mass;
+    protected float mass;
 
     /**
      *How many game-frames should go by before the next animation frame is loaded
      */
-    int frametime=10;
+    protected int frameTime=10;
 
     /*
      *Variable keeps track of game-frames since last animation frame change
      */
 
-    int timecount=0;
+    protected int timecount=0;
 
     /**
      *variable keeps track of what frame we're on in an animation sequence
      */
-    int frame=0;
+    protected int frame=0;
 
-    boolean dead;
-    boolean onTheGround;
-    boolean goingRight;
-    boolean goingLeft;
-    boolean facingLeft;
-    boolean friction;
+    protected boolean dead;
+    protected boolean onTheGround;
+    protected boolean goingRight;
+    protected boolean goingLeft;
+    protected boolean facingLeft;
+    protected boolean friction;
 
     /**Occasionally, it may be desired that collisions are ignored*/
-    boolean ignoreCollision;
+    protected boolean ignoreCollision;
 
 
 
@@ -116,6 +116,8 @@ abstract class ActiveCollidable extends Collidable {
     {
       collideShape=new Rectangle2D.Float(x,y,curSprite.getWidth(),curSprite.getHeight());
     }
+   
+   @Override
     public Rectangle2D getbBox(){return collideShape;}
 
     void die() throws DeadException
@@ -148,7 +150,6 @@ abstract class ActiveCollidable extends Collidable {
         {
             throw e;
         }
-
        
 
         updateState();
@@ -169,11 +170,7 @@ void tryMoveX(float delx, GameObjects go) throws DeadException
              {
                  if(collidesWith(i))
                  {
-                    
-                        
-                    
                      handleTerrainCollisionX(i);
-
                  }
              }
          }
@@ -191,7 +188,6 @@ void tryMoveX(float delx, GameObjects go) throws DeadException
              else if(collidesWith(i))
              {
                  handleActorCollisionX(i);
-               
              }
          }
     }

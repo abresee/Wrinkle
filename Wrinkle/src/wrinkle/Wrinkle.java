@@ -7,14 +7,9 @@
  * and open the template in the editor.
  */
 package wrinkle;
-import java.awt.MouseInfo;
-import java.awt.PointerInfo;
 import java.awt.Point;
 import java.awt.Graphics2D;
 import java.util.LinkedList;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.File;
 
 /**
  * Class that defines the player character
@@ -24,6 +19,7 @@ public final class Wrinkle extends Actor {
 
    private boolean biting;
    private boolean breathingFire;
+
 
 
    private AnimationSet d;
@@ -75,7 +71,6 @@ public final class Wrinkle extends Actor {
     @Override
     void die() throws DeadException
     {
-        System.out.println("dead");
         throw new DeadException();
     }
 
@@ -172,13 +167,37 @@ public final class Wrinkle extends Actor {
         x_ = mouseLoc.getX()+Global.OffsetX;
         y_ = mouseLoc.getY()+Global.OffsetY;
        }
-        double spawnX=x-10+((facingLeft)?0:getWidth());
-        double spawnY=y+10;
+        double spawnX=x-20+((facingLeft)?40:getWidth());
+        double spawnY=y+40;
         
         double delx = x_-(spawnX);
         double dely = y_-(spawnY);
 
         double angle=Math.atan2(dely,delx);
+
+        if(facingLeft)
+        {
+            if(angle>0&&angle<3*Math.PI/4)
+            {
+                angle=3*Math.PI/4;
+            }
+            else if(angle<=0&&angle>-3*Math.PI/4)
+            {
+                angle=-3*Math.PI/4;
+            }
+
+        }
+        else
+        {
+            if(angle>Math.PI/4)
+            {
+                angle=Math.PI/4;
+            }
+            else if(angle<-Math.PI/4)
+            {
+                angle=-Math.PI/4;
+            }
+        }
        // double mag=Math.sqrt(delx*delx+dely*dely);
         
 

@@ -10,8 +10,28 @@ package wrinkle;
  * @author a.bresee
  */
 abstract public class Enemy extends Actor{
-    Enemy(String str, int X, int Y)
+
+    protected boolean active=false;
+    Wrinkle wrinkle;
+    Enemy(Wrinkle wrinkle_, String str, int X, int Y)
     {
         super(str, X, Y);
+        wrinkle=wrinkle_;
     }
+
+    @Override
+    void update(GameObjects go) throws DeadException
+    {
+        if(active)
+        {
+            activeScript();
+        }
+        else
+        {
+            idleScript();
+        }
+        super.update(go);
+    }
+    abstract protected void activeScript();
+    abstract protected void idleScript();
 }

@@ -87,7 +87,6 @@ public class Game extends JPanel implements KeyListener, MouseMotionListener
 
     public boolean go()
     {
-        System.out.println("game start");
         l = new Level();
         q = l.getImage();
         while (true)
