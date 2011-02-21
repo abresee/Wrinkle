@@ -66,7 +66,6 @@ public abstract class Actor extends ActiveCollidable {
         state=State.idle;
         curSprite = currentSet.getNextSprite(state, facingLeft);
 
-
     }
 
     /**this is just a subroutine to make things cleaner*/
@@ -170,6 +169,7 @@ public abstract class Actor extends ActiveCollidable {
         }
     }
 
+
     void updateAnim() {
         if(frame++%frameTime==0)
         {
@@ -230,5 +230,9 @@ public abstract class Actor extends ActiveCollidable {
             clip.setFramePosition(0);
             clip.start();
         }
+    }
+    int getHealth()
+    {
+        return health;
     }
 }

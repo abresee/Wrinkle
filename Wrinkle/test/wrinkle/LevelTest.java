@@ -181,7 +181,7 @@ public class LevelTest {
     public void testDrawToForeground() {
         System.out.println("drawToForeground");
         Level instance = new Level();
-        instance.drawToForeground();
+        instance.drawForeground();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

@@ -27,51 +27,56 @@ public final class Bird extends Enemy
         {
             if(frame%200==0)
             {
-                velX+=((facingLeft)?.1:-.1);
-               
-            }
-            if(frame%150==0)
-            {
                 jump();
-                velX-=((facingLeft)?.1:-.1);
+                velX+=((facingLeft)?-.1:.1);
+               
             }
         }
         
     }
     protected void activeScript()
     {
-
+            boolean cond=((wrinkle.getX()-x)>0);
+            velX=(float)(.3*((cond)?1:-1));
+            facingLeft=!cond;
+        
     }
     
-//
-//    @Override
-//    void handleTerrainCollisionY(Terrain i)
-//    {
-//        super.handleTerrainCollisionX(i);
-//
-//        if(velY>0&&!active)
-//        {
-//            velX=0;
-//        }
-//        System.out.println("lol");
-//        facingLeft=!facingLeft;
-//    }
+
+    @Override
+    void handleTerrainCollisionY(Terrain i)
+    {
+        super.handleTerrainCollisionY(i);
+
+        if(!active)
+        {
+        facingLeft=!facingLeft;
+        }
+        else
+        {
+            jump();
+        }
+    }
 
     @Override
     void draw(Graphics2D g)
     {
-       System.out.println("X: "+x+"\nY: "+y);
         super.draw(g);
     }
     @Override
     void updateVel()
     {
+       if(onTheGround&&!active)
+       {
+           velX=0;
+       }
         velY+=accelY*Global.timeStep;
          if (Math.abs(velY) > maxVelY) {
             velY = (velY < 0) ? -maxVelY : maxVelY;
         }
 
     }
+
 //    void die()
 //    {
 //        super.die();

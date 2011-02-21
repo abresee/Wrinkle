@@ -23,12 +23,14 @@ import java.io.File;
  * Class representing the actual game simulation itself. 
  * @author a.bresee
  */
-public class Level{
+public class Level {
 
     private Wrinkle wrinkle;
     private GameObjects gameObjects;
     private BufferedImage[] backgrounds;
     private BufferedImage buff;
+    private BufferedImage heartFilled;
+    private BufferedImage heartUnfilled;
     private boolean running;
     private Graphics2D buffg;
     private Graphics2D panel;
@@ -50,12 +52,14 @@ public class Level{
 
         gameObjects = new GameObjects();
 
-        String prefix = "Data/Images/background/";
+        String prefix = "Data/Images/";
         backgrounds = new BufferedImage[3];
         try {
-            backgrounds[2] = ImageIO.read(new File(prefix + "bg1.png"));
-            backgrounds[1] = ImageIO.read(new File(prefix + "bg2.png"));
-            backgrounds[0] = ImageIO.read(new File(prefix + "bg3.png"));
+            backgrounds[2] = ImageIO.read(new File(prefix + "background/bg1.png"));
+            backgrounds[1] = ImageIO.read(new File(prefix + "background/bg2.png"));
+            backgrounds[0] = ImageIO.read(new File(prefix + "background/bg3.png"));
+            heartFilled = ImageIO.read(new File(prefix + "hud/heartFilled.png"));
+            heartUnfilled = ImageIO.read(new File(prefix + "hud/heartUnfilled.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,47 +83,49 @@ public class Level{
         gameObjects.add(new Terrain(1200, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Terrain(1800, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Bird(wrinkle, 600, 300));
-        gameObjects.add(new Dragon(wrinkle,1200,Global.GroundLevel));
+        gameObjects.add(new Dragon(wrinkle, 1200, Global.GroundLevel));
+        gameObjects.add(new Terrain(-400, 0, 400, Global.WinY, Color.DARK_GRAY));
     }
 
-    Wrinkle getWrinkle()
-    {
+    Wrinkle getWrinkle() {
         return wrinkle;
     }
 
-void Jump()
-    {
-    wrinkle.jump();
-}
-void goRight()
-    {
-    wrinkle.goRight();
-}
-void goLeft()
-    {
-    wrinkle.goLeft();
-}
-void jump()
-    {
-    wrinkle.jump();
-}
-void breatheFire()
-    {
-    wrinkle.breatheFire();
-}
-void unBreatheFire()
-    {
-    wrinkle.unBreatheFire();
-}
-void unGoRight()
-    {
-    wrinkle.unGoRight();
-}
-void unGoLeft()
-    {
-    wrinkle.unGoLeft();
-}
-   public BufferedImage getImage(){return buff;}
+    void Jump() {
+        wrinkle.jump();
+    }
+
+    void goRight() {
+        wrinkle.goRight();
+    }
+
+    void goLeft() {
+        wrinkle.goLeft();
+    }
+
+    void jump() {
+        wrinkle.jump();
+    }
+
+    void breatheFire() {
+        wrinkle.breatheFire();
+    }
+
+    void unBreatheFire() {
+        wrinkle.unBreatheFire();
+    }
+
+    void unGoRight() {
+        wrinkle.unGoRight();
+    }
+
+    void unGoLeft() {
+        wrinkle.unGoLeft();
+    }
+
+    public BufferedImage getImage() {
+        return buff;
+    }
 
     void drawBackground() {
 
@@ -142,7 +148,7 @@ void unGoLeft()
 
     }
 
-    void drawToForeground() {
+    void drawForeground() {
         //buffg.clearRect(0, 0, Global.WinX, Global.WinY);
         at.setToTranslation(-Global.OffsetX, -Global.OffsetY);
         buffg.setTransform(at);
@@ -150,7 +156,21 @@ void unGoLeft()
         gameObjects.draw(buffg);
 
         wrinkle.draw(buffg);
+        drawHUD();
 
+    }
+
+    void drawHUD() {
+        int hearts=wrinkle.getHealth();
+        int maxHearts=wrinkle.getMaxHealth();
+        at.setToIdentity();
+        buffg.setTransform(at);
+        for(int i=0;i<maxHearts;++i)
+        {
+            BufferedImage draw=(i<hearts)?heartFilled:heartUnfilled;
+            buffg.drawImage(draw,0+i*draw.getWidth(),0,null);
+
+        }
     }
 
     void go() throws DeadException {
@@ -159,7 +179,7 @@ void unGoLeft()
         wrinkle.update(gameObjects);
 
         drawBackground();
-        drawToForeground();
+        drawForeground();
 
     }
 }

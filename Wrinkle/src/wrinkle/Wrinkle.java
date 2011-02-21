@@ -19,7 +19,7 @@ public final class Wrinkle extends Actor {
 
    private boolean biting;
    private boolean breathingFire;
-
+   private final int maxHealth;
 
 
    private AnimationSet d;
@@ -60,8 +60,14 @@ public final class Wrinkle extends Actor {
         biting=false;
         breathingFire=false;
         health=3;
+        maxHealth=health;
+
         lock = new Object();
         mouseLoc = new Point();
+    }
+    int getMaxHealth()
+    {
+        return maxHealth;
     }
 
     /**

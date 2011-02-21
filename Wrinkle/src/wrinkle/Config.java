@@ -13,5 +13,5 @@ public class Config {
     static public int MoveLeft=KeyEvent.VK_A;
     static public int MoveRight=KeyEvent.VK_D;
     static public int Jump=KeyEvent.VK_SPACE;
-    static public int BreatheFire=KeyEvent.VK_Q;
+    static public int Action=KeyEvent.VK_Q;
 }
