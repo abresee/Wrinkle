@@ -20,8 +20,9 @@ public class DragonAnimationSet extends AnimationSet{
     protected ArrayList<BufferedImage> leftSleep;
     DragonAnimationSet()
     {
-        String prefix="Data/images/dragon/";
         super("dragon");
+        String prefix="Data/images/dragon/";
+        
         rightSleep=new ArrayList<BufferedImage>();
         leftSleep=new ArrayList<BufferedImage>();
         try{
