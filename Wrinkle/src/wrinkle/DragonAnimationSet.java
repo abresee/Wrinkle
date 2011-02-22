@@ -18,9 +18,10 @@ public class DragonAnimationSet extends AnimationSet{
 
     protected ArrayList<BufferedImage> rightSleep;
     protected ArrayList<BufferedImage> leftSleep;
-    DragonAnimationSet()
+    protected int sleepFrame;
+    DragonAnimationSet(AnimationSet a)
     {
-        super("dragon");
+        super(a);
         String prefix="Data/images/dragon/";
         
         rightSleep=new ArrayList<BufferedImage>();
@@ -36,7 +37,20 @@ public class DragonAnimationSet extends AnimationSet{
         {
             e.printStackTrace();
         }
-
+        sleepFrame=0;
     }
-
+    @Override
+    BufferedImage getNextSprite(State s, boolean facingLeft)
+    {
+        if(s==State.sleeping)
+        {
+            return (facingLeft)
+                    ?leftSleep.get(sleepFrame++%leftSleep.size())
+                    :rightSleep.get(sleepFrame++%rightSleep.size());
+        }
+        else
+        {
+            return super.getNextSprite(s,facingLeft);
+        }
+    }
 }

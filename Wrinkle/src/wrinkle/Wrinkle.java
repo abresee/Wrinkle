@@ -89,13 +89,6 @@ public final class Wrinkle extends Actor {
     {
         return breathingFire;
     }
-    void setMouseLoc(Point p)
-    {
-        synchronized(lock)
-        {
-        mouseLoc=p;
-        }
-    }
 
     void goRight()
     {
@@ -210,9 +203,24 @@ public final class Wrinkle extends Actor {
 
         fireList.add(new Fire((float)spawnX,(float)spawnY,(float)1,(float)angle));
     }
-    void breatheFire()
+
+    void setMouseLoc(Point p)
     {
-       breathingFire=true;
+    synchronized(lock)
+        {
+        mouseLoc=p;
+        }
+    }
+    void breatheFire(Point p)
+    {
+       if(m==JobMode.dragon)
+       {
+            breathingFire=true;
+            synchronized(lock)
+            {
+            mouseLoc=p;
+            }
+       }
     }
     void unBreatheFire()
     {

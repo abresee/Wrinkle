@@ -15,6 +15,20 @@ public final class Dragon extends Enemy{
     Dragon(Wrinkle wrinkle, int X, int Y)
     {
         super(wrinkle, "dragon",X,Y);
+        currentSet=new DragonAnimationSet(currentSet);
+    }
+
+    @Override
+    void updateState()
+    {
+        if(!active)
+        {
+            state=State.sleeping;
+        }
+        else
+        {
+            super.updateState();
+        }
     }
     protected void idleScript()
     {

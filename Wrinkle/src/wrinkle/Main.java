@@ -20,7 +20,7 @@ public class Main {
     JFrame window=new JFrame("Wrinkle... th-t-the Dinosaur!");
        Game g;
        
-                    
+              
             g=new Game();
 
             window.add(g);
@@ -34,10 +34,14 @@ public class Main {
             window.setSize(Global.WinX+xoff, Global.WinY+yoff);
             window.validate();
             window.addKeyListener(g);
+            window.addMouseListener(g);
             window.addMouseMotionListener(g);
+            int lives=3;
             do{
-                
-            }while(g.go());
+                g.go();
+                --lives;
+            }while(lives>0);
+            window.dispose();
             
     }
 

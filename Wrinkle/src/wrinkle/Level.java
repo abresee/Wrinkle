@@ -72,10 +72,9 @@ public class Level {
 
         wrinkle = new Wrinkle(Global.WinX / 4 + 1, Global.WinY - 200);
 
-        gameObjects.add(new Terrain(0, Global.GroundLevel,
-                400, 400, Color.GREEN));
-
-        gameObjects.add(new DieBox(0, Global.WinY, Global.WinX, Global.WinY));
+        gameObjects.add(new Terrain(0, Global.GroundLevel,400, 400, Color.GREEN));
+        gameObjects.add(new DieBox(0, Global.WinY, 5*Global.WinX, Global.WinY));
+        gameObjects.add(new Terrain(0, Global.GroundLevel,400, 400, Color.GREEN));
         gameObjects.add(new Terrain(500, Global.GroundLevel, 300, 400, Color.RED));
         gameObjects.add(new Terrain(300, 400, 100, 100));
         gameObjects.add(new Terrain(200, 200, 50, 50));
@@ -107,10 +106,14 @@ public class Level {
         wrinkle.jump();
     }
 
-    void breatheFire() {
-        wrinkle.breatheFire();
+    void breatheFire(Point p) {
+        wrinkle.breatheFire(p);
     }
 
+    void setMouseLoc(Point p)
+    {
+        wrinkle.setMouseLoc(p);
+    }
     void unBreatheFire() {
         wrinkle.unBreatheFire();
     }
@@ -160,7 +163,8 @@ public class Level {
 
     }
 
-    void drawHUD() {
+    void drawHUD()
+    {
         int hearts=wrinkle.getHealth();
         int maxHearts=wrinkle.getMaxHealth();
         at.setToIdentity();

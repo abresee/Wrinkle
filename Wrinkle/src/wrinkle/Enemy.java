@@ -13,10 +13,12 @@ abstract public class Enemy extends Actor{
 
     protected boolean active=false;
     protected Wrinkle wrinkle;
+    protected boolean vulnerable=false;
     Enemy(Wrinkle wrinkle_, String str, int X, int Y)
     {
         super(str, X, Y);
         wrinkle=wrinkle_;
+        state=State.sleeping;
     }
 
     @Override
@@ -40,7 +42,19 @@ abstract public class Enemy extends Actor{
         }
         super.update(go);
     }
+    void bitten() throws DeadException
+    {
+        if(vulnerable)
+        {
+            die();
+            return;
+        }
+        else
+        {
+            vulnerable=true;
+        }
 
+    }
    
     abstract protected void activeScript();
     abstract protected void idleScript();

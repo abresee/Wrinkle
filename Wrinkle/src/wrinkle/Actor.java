@@ -28,8 +28,8 @@ public abstract class Actor extends ActiveCollidable {
     
     protected State state;
     protected int health;
-    protected boolean invulnerable;
-    protected int invulnCount;
+    protected boolean recovering;
+    protected int recoverCount;
     /**set to false if sound initialization doesn't complete*/
     private boolean soundImplemented;
     AnimationSet normal;
@@ -40,12 +40,12 @@ public abstract class Actor extends ActiveCollidable {
     protected Clip land;
 
     void hurt() throws DeadException {
-        if(!invulnerable)
+        if(!recovering)
         {
             if (health > 0) {
                 --health;
-                invulnerable=true;
-                invulnCount++;
+                recovering=true;
+                recoverCount++;
             } else {
                 die();
             }
@@ -97,7 +97,7 @@ public abstract class Actor extends ActiveCollidable {
     @Override
     void draw(Graphics2D g)
     {
-    if(invulnCount%3==0)
+    if(recoverCount%3==0)
         {
         super.draw(g);
         }
@@ -159,12 +159,12 @@ public abstract class Actor extends ActiveCollidable {
         } else {
             state = State.jumping;
         }
-        if(invulnerable)
+        if(recovering)
         {
-            if(invulnCount++%40==0)
+            if(recoverCount++%40==0)
             {
-                invulnCount=0;
-                invulnerable=false;
+                recoverCount=0;
+                recovering=false;
             }
         }
     }

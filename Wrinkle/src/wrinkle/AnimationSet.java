@@ -27,7 +27,15 @@ public class AnimationSet {
     private int walkFrame=0;
     private int actionFrame=0;
 
-    
+    AnimationSet(AnimationSet a)
+    {
+        rightWalk=a.rightWalk;
+        leftWalk=a.leftWalk;
+        rightAction=a.rightAction;
+        leftAction=a.leftAction;
+        rightIdle=a.rightIdle;
+        leftJump=a.leftJump;
+     }
      AnimationSet(String str)
     {
         String prefix="Data/images/"+str+"/";

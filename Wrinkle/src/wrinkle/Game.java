@@ -14,7 +14,7 @@ import java.awt.event.*;
  *
  * @author alex
  */
-public class Game extends JPanel implements KeyListener, MouseMotionListener
+public class Game extends JPanel implements KeyListener,MouseListener,MouseMotionListener
 {
 
     Level l;
@@ -47,9 +47,7 @@ public class Game extends JPanel implements KeyListener, MouseMotionListener
                 l.goRight();
             } else if (key == Config.MoveLeft) {
                 l.goLeft();
-            } else if (key == Config.Action) {
-                l.breatheFire();
-            }
+            } 
          }
     }
 
@@ -71,19 +69,22 @@ public class Game extends JPanel implements KeyListener, MouseMotionListener
     public void keyTyped(KeyEvent e) {
     }
 
-    public void mouseMoved(MouseEvent e)
+    public void mouseExited(MouseEvent e){}
+    public void mouseEntered(MouseEvent e){}
+    public void mouseClicked(MouseEvent e){}
+    public void mouseMoved(MouseEvent e){}
+    public void mouseDragged(MouseEvent e)
     {
-       if(l!=null)
-       {
-            Wrinkle w=l.getWrinkle();
-            if(w.isBreathingFire())
-            {
-                l.getWrinkle().setMouseLoc(e.getPoint());
-            }
-        }
+        l.setMouseLoc(e.getPoint());
     }
-    public void mouseDragged(MouseEvent e){}
-    
+    public void mousePressed(MouseEvent e)
+    {
+        l.breatheFire(e.getPoint());
+    }
+    public void mouseReleased(MouseEvent e)
+    {
+        l.unBreatheFire();
+    }
 
     public boolean go()
     {
