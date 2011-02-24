@@ -9,9 +9,7 @@
 package wrinkle;
 import javax.sound.sampled.*;
 import java.io.File;
-import java.awt.Point;
-
-
+import java.awt.image.BufferedImage;
 
 /**
  * Class contains constants and functions that other classes might find handy
@@ -47,6 +45,14 @@ public class Global{
             throw e;
         }
 
+    }
+    static BufferedImage convert(BufferedImage in)
+    {
+
+        BufferedImage temp=new BufferedImage(in.getWidth(),in.getHeight(),
+        BufferedImage.TYPE_INT_ARGB);
+        temp.getGraphics().drawImage(in, 0, 0, null);
+        return temp;
     }
     
 }

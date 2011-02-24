@@ -32,8 +32,7 @@ public abstract class Actor extends ActiveCollidable {
     protected int recoverCount;
     /**set to false if sound initialization doesn't complete*/
     private boolean soundImplemented;
-    AnimationSet normal;
-    AnimationSet currentSet;
+    AnimationSet set;
     protected Clip jumpsnd;
     protected Clip walk1;
     protected Clip walk2;
@@ -67,17 +66,15 @@ public abstract class Actor extends ActiveCollidable {
 
         super(X, Y, velX_, velY_, accelX_, accelY_);
         try{
-        normal = new AnimationSet(str);
         }
         catch(Exception e)
         {
          e.printStackTrace();
         }
-        currentSet = normal;
+        
         initSounds(str);
         state=State.idle;
-        curSprite = currentSet.getNextSprite(state, facingLeft);
-
+        
     }
 
     /**this is just a subroutine to make things cleaner*/
@@ -198,7 +195,7 @@ public abstract class Actor extends ActiveCollidable {
     void updateAnim() {
         if(frame++%frameTime==0)
         {
-        curSprite=currentSet.getNextSprite(state,facingLeft);
+        curSprite=set.getNextSprite(state,m,facingLeft);
         }
     }
 

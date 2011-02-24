@@ -16,30 +16,42 @@ import java.util.Collections;
  */
 public class DragonAnimationSet extends AnimationSet{
 
-    protected ArrayList<BufferedImage> rightSleep;
-    protected ArrayList<BufferedImage> leftSleep;
+    protected static AnimationCollection a;
+    protected static ArrayList<BufferedImage> rightSleep;
+    protected static ArrayList<BufferedImage> leftSleep;
     protected int sleepFrame;
-    DragonAnimationSet(AnimationSet a)
+    static final String str="Data/images/dragon/";
+    static
     {
-        super(a);
-        String prefix="Data/images/dragon/";
-        
+        a=new AnimationCollection(str);
         rightSleep=new ArrayList<BufferedImage>();
         leftSleep=new ArrayList<BufferedImage>();
         try{
             for(int i=0;i<Global.framecount;++i)
             {
-                rightSleep.add(ImageIO.read(new File(prefix+"rightsleep"+i+".png")));
-                leftSleep.add(ImageIO.read(new File(prefix+"leftsleep"+i+".png")));
+                rightSleep.add(ImageIO.read(new File(str+"rightsleep"+i+".png")));
+                leftSleep.add(ImageIO.read(new File(str+"leftsleep"+i+".png")));
             }
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
+        convertAll();
+    }
+    
+    DragonAnimationSet()
+    {                
         sleepFrame=0;
     }
-    @Override
+    static void convertAll()
+    {
+        for(int i=0;i<rightSleep.size();++i)
+        {
+            rightSleep.set(i,Global.convert(rightSleep.get(i)));
+            leftSleep.set(i,Global.convert(leftSleep.get(i)));
+        }
+    }
     BufferedImage getNextSprite(State s, boolean facingLeft)
     {
         if(s==State.sleeping)
@@ -50,7 +62,7 @@ public class DragonAnimationSet extends AnimationSet{
         }
         else
         {
-            return super.getNextSprite(s,facingLeft);
+            return a.getNextSprite(s,facingLeft);
         }
     }
 }

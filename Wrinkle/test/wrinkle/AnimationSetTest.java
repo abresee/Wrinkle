@@ -46,7 +46,7 @@ public class AnimationSetTest {
         System.out.println("getNextSprite");
         State s = null;
         boolean facingLeft = false;
-        AnimationSet instance = null;
+        AnimationCollection instance = null;
         BufferedImage expResult = null;
         BufferedImage result = instance.getNextSprite(s, facingLeft);
         assertEquals(expResult, result);

@@ -18,8 +18,10 @@ public final class Bird extends Enemy
     Bird(Wrinkle wrinkle,int X, int Y)
     {
         super(wrinkle,"bird",X,Y);
+        set=new BirdAnimationSet();
         health=3;
         m=JobMode.bird;
+        curSprite = set.getNextSprite(state, facingLeft);
     }
 
     protected void idleScript()

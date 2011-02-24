@@ -18,20 +18,35 @@ abstract public class Enemy extends Actor{
     protected boolean active=false;
     protected Wrinkle wrinkle;
     protected boolean vulnerable=false;
-    protected int wait;
     private final int waittime=100;
     static LookupOp luo;
+    private int vulncount;
 
 
     static
     {
-         short[] data = new short[256];
-    for (short i = 0; i < 256; i++)
+        final int size=256;
+        short[] r = new short[size];
+        short[] g = new short[size];
+        short[] b = new short[size];
+        short[] a = new short[size];
+        short[][] data = new short[][]{r,g,b,a};
+        for (int i = 0; i < size; ++i)
         {
-        data[i] = (short)255;
+            r[i] = (short)(255);
+            g[i] = (short)(0);
+            b[i]= (short)(0);
+            a[i] = (short)(i);
         }
 
-        ShortLookupTable l=new ShortLookupTable(0, data);
+        ShortLookupTable l=new ShortLookupTable(0,data);
+        for(short[] i : l.getTable())
+        {
+            for(short j : i)
+            {
+                System.out.println(j);
+            }
+        }
         luo=new LookupOp(l, null);
     }
 
@@ -40,7 +55,6 @@ abstract public class Enemy extends Actor{
         super(str, X, Y);
         wrinkle=wrinkle_;
         state=State.sleeping;
-        wait=0;
     }
 
     
@@ -64,13 +78,18 @@ abstract public class Enemy extends Actor{
             idleScript();
         }
         super.update(go);
+        if(vulnerable)
+        {
+            vulncount++;
+
+        }
     }
     void bitten() throws DeadException
     {
 
         if(vulnerable)
         {
-           if(wait++>waittime)
+           if(vulncount>waittime+10)
             {
             die();
             }
@@ -85,13 +104,14 @@ abstract public class Enemy extends Actor{
     @Override
     boolean isVulnerable()
     {
-        return vulnerable&&(wait>waittime);
+        return vulnerable&&(vulncount>waittime);
     }
     @Override
     void draw(Graphics2D g)
     {
-        if(vulnerable)
+        if(vulnerable&&vulncount/5%5==0)
         {
+
             g.drawImage(curSprite, luo, (int)x, (int)y);
         }
         else

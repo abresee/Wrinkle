@@ -9,6 +9,6 @@ package wrinkle;
  *
  * @author alex
  */
-abstract class StaticCollidable extends Collidable {
+public class EnemyAnimationSet {
 
 }

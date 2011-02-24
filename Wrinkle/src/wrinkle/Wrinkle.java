@@ -25,7 +25,7 @@ public final class Wrinkle extends Actor {
    private final int maxHealth;
 
 
-   private AnimationSet d;
+   private AnimationCollection d;
    
    
    private LinkedList<Fire> fireList;
@@ -55,15 +55,7 @@ public final class Wrinkle extends Actor {
      */
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
-        try{
-        d=new AnimationSet("hero/dragon");
-        }
-        catch(java.io.IOException e)
-        {
-            e.printStackTrace();
-        }
-        normal = new WrinkleAnimationSet(normal);
-        currentSet=normal;
+        set=new WrinkleAnimationSet();
         fireList=new LinkedList<Fire>();
         fireListLock=new Object();
         mass = 1;
@@ -75,6 +67,7 @@ public final class Wrinkle extends Actor {
 
         lock = new Object();
         mouseLoc = new Point();
+        curSprite = set.getNextSprite(state, facingLeft);
     }
     int getMaxHealth()
     {
@@ -113,6 +106,8 @@ public final class Wrinkle extends Actor {
     {
         return true;
     }
+
+    /**Required but unused*/
     void bitten(){}
 
     void goRight()
@@ -242,6 +237,7 @@ public final class Wrinkle extends Actor {
         if(biting&i.isVulnerable())
         {
             m=i.getMode();
+
         }
     }
     void setMouseLoc(Point p)
@@ -329,18 +325,5 @@ public final class Wrinkle extends Actor {
         {
             state=State.biting;
         }
-    }
-    @Override
-    void updateAnim()
-    {
-        if(m==JobMode.normal)
-        {
-            currentSet=normal;
-        }
-        if(m==JobMode.dragon)
-        {
-            currentSet=d;
-        }
-        super.updateAnim();
     }
 }
