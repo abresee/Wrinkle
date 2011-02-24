@@ -14,4 +14,5 @@ public class Config {
     static public int MoveRight=KeyEvent.VK_D;
     static public int Jump=KeyEvent.VK_SPACE;
     static public int Action=KeyEvent.VK_Q;
+    static public int UnJob=KeyEvent.VK_Z;
 }

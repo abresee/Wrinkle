@@ -31,11 +31,8 @@ public class Level {
     private BufferedImage buff;
     private BufferedImage heartFilled;
     private BufferedImage heartUnfilled;
-    private boolean running;
     private Graphics2D buffg;
-    private Graphics2D panel;
     private AffineTransform at;
-    private Clip bgm;
 
     public Level() {
 //        try{
@@ -68,7 +65,6 @@ public class Level {
         buffg = buff.createGraphics();
         buffg.setBackground(Color.cyan);
 
-        running = true;
 
         wrinkle = new Wrinkle(Global.WinX / 4 + 1, Global.WinY - 200);
 
@@ -83,7 +79,7 @@ public class Level {
         gameObjects.add(new Terrain(1800, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Bird(wrinkle, 600, 300));
         gameObjects.add(new Dragon(wrinkle, 1200, Global.GroundLevel));
-        gameObjects.add(new Terrain(-400, 0, 400, Global.WinY, Color.DARK_GRAY));
+        gameObjects.add(new Terrain(-400, -Global.WinY, 400, 3*Global.WinY, Color.DARK_GRAY));
     }
 
     Wrinkle getWrinkle() {
@@ -106,8 +102,20 @@ public class Level {
         wrinkle.jump();
     }
 
-    void breatheFire(Point p) {
-        wrinkle.breatheFire(p);
+    void clickAction(Point p) {
+        wrinkle.clickAction(p);
+    }
+    void keyAction()
+    {
+        wrinkle.keyAction();
+    }
+    void unKeyAction()
+    {
+        wrinkle.unKeyAction();
+    }
+    void unJob()
+    {
+        wrinkle.unJob();
     }
 
     void setMouseLoc(Point p)

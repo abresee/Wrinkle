@@ -16,6 +16,7 @@ public final class Dragon extends Enemy{
     {
         super(wrinkle, "dragon",X,Y);
         currentSet=new DragonAnimationSet(currentSet);
+        m=JobMode.dragon;
     }
 
     @Override

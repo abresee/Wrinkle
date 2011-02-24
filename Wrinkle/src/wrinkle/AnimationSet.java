@@ -16,14 +16,14 @@ import java.util.Collections;
  */
 public class AnimationSet {
 
-    protected ArrayList<BufferedImage> rightWalk;
-    protected ArrayList<BufferedImage> leftWalk;
-    protected ArrayList<BufferedImage> rightAction;
-    protected ArrayList<BufferedImage> leftAction;
-    protected BufferedImage rightIdle;
-    protected BufferedImage leftIdle;
-    protected BufferedImage rightJump;
-    protected BufferedImage leftJump;
+    private final ArrayList<BufferedImage> rightWalk;
+    private final ArrayList<BufferedImage> leftWalk;
+    private final ArrayList<BufferedImage> rightAction;
+    private final ArrayList<BufferedImage> leftAction;
+    private final BufferedImage rightIdle;
+    private final BufferedImage leftIdle;
+    private final BufferedImage rightJump;
+    private final BufferedImage leftJump;
     private int walkFrame=0;
     private int actionFrame=0;
 
@@ -34,9 +34,11 @@ public class AnimationSet {
         rightAction=a.rightAction;
         leftAction=a.leftAction;
         rightIdle=a.rightIdle;
+        leftIdle=a.leftIdle;
         leftJump=a.leftJump;
+        rightJump=a.rightJump;
      }
-     AnimationSet(String str)
+     AnimationSet(String str) throws java.io.IOException
     {
         String prefix="Data/images/"+str+"/";
         rightWalk=new ArrayList<BufferedImage>();
@@ -44,30 +46,25 @@ public class AnimationSet {
 
         rightAction=new ArrayList<BufferedImage>();
         leftAction=new ArrayList<BufferedImage>();
-        try
+        rightIdle=ImageIO.read(new File(prefix+"rightidle.png"));
+        leftIdle=ImageIO.read(new File(prefix+"leftidle.png"));
+        String name="right";
+        for(int i=0;i<Global.framecount;++i)
         {
-            rightIdle=ImageIO.read(new File(prefix+"rightidle.png"));
-            leftIdle=ImageIO.read(new File(prefix+"leftidle.png"));
-            String name="right";
-
-            for(int i=0;i<Global.framecount;++i)
-            {
-              rightWalk.add(ImageIO.read(new File(prefix+name+"walk"+i+".png")));
-              rightAction.add(ImageIO.read(new File(prefix+name+"action"+i+".png")));
-            }
-
-            name="left";
-            for(int i=0;i<Global.framecount;++i)
-            {
-                leftWalk.add(ImageIO.read(new File(prefix+name+"walk"+i+".png")));
-                leftAction.add(ImageIO.read(new File(prefix+name+"action"+i+".png")));
-            }
-
-            rightJump=ImageIO.read(new File(prefix+"rightjump.png"));
-            leftJump=ImageIO.read(new File(prefix+"leftjump.png"));
-           
+          rightWalk.add(ImageIO.read(new File(prefix+name+"walk"+i+".png")));
+          rightAction.add(ImageIO.read(new File(prefix+name+"action"+i+".png")));
         }
-        catch(Exception e){e.printStackTrace();}
+
+        name="left";
+        for(int i=0;i<Global.framecount;++i)
+        {
+            leftWalk.add(ImageIO.read(new File(prefix+name+"walk"+i+".png")));
+            leftAction.add(ImageIO.read(new File(prefix+name+"action"+i+".png")));
+        }
+
+        rightJump=ImageIO.read(new File(prefix+"rightjump.png"));
+        leftJump=ImageIO.read(new File(prefix+"leftjump.png"));
+        
     }
    BufferedImage getNextSprite(State s, boolean facingLeft)
    {

@@ -15,6 +15,9 @@ import java.util.LinkedList;
  * Class that defines the player character
  * @author a.bresee
  */
+
+enum JobMode{normal,bird,dragon};
+
 public final class Wrinkle extends Actor {
 
    private boolean biting;
@@ -23,6 +26,7 @@ public final class Wrinkle extends Actor {
 
 
    private AnimationSet d;
+   
    
    private LinkedList<Fire> fireList;
    private final Object fireListLock;
@@ -35,8 +39,8 @@ public final class Wrinkle extends Actor {
      *Enum to flag what 'copy mode' wrinkle is using
      *@author a.bresee
      */
-    private enum JobMode{normal,bird,dragon};
-    private JobMode m;
+    
+    
     
     
     /**
@@ -51,12 +55,19 @@ public final class Wrinkle extends Actor {
      */
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
+        try{
         d=new AnimationSet("hero/dragon");
-        currentSet=d;
+        }
+        catch(java.io.IOException e)
+        {
+            e.printStackTrace();
+        }
+        normal = new WrinkleAnimationSet(normal);
+        currentSet=normal;
         fireList=new LinkedList<Fire>();
         fireListLock=new Object();
         mass = 1;
-        m=JobMode.dragon;
+        m=JobMode.normal;
         biting=false;
         breathingFire=false;
         health=3;
@@ -89,6 +100,20 @@ public final class Wrinkle extends Actor {
     {
         return breathingFire;
     }
+
+    boolean isBiting()
+    {
+        return biting;
+    }
+    boolean isEnemy()
+    {
+        return false;
+    }
+    boolean isPlayer()
+    {
+        return true;
+    }
+    void bitten(){}
 
     void goRight()
     {
@@ -152,7 +177,9 @@ public final class Wrinkle extends Actor {
             Global.OffsetY = y - Global.WinY / 2;
         } 
         
-        else if ((y - Global.OffsetY + curSprite.getHeight()) > Global.WinY - 50)
+        else if ((y - Global.OffsetY +
+                curSprite.getHeight())
+                > Global.WinY - 50)
         {
             Global.OffsetY = (y + curSprite.getHeight()) - (Global.WinY - 50);
         }
@@ -169,10 +196,16 @@ public final class Wrinkle extends Actor {
         double spawnX=x-20+((facingLeft)?40:getWidth());
         double spawnY=y+40;
         
-        double delx = x_-(spawnX);
-        double dely = y_-(spawnY);
+        double delx = x_-spawnX;
+        double dely = y_-spawnY;
 
         double angle=Math.atan2(dely,delx);
+        double delVelX=Math.cos(angle);
+        double delVelY=Math.sin(angle);
+        delVelX+=velX;
+        delVelY+=velY;
+        angle=Math.atan2(delVelY, delVelX);
+        double mag=Math.sqrt(delVelX*delVelX+delVelY*delVelY);
 
         if(facingLeft)
         {
@@ -197,13 +230,20 @@ public final class Wrinkle extends Actor {
                 angle=-Math.PI/4;
             }
         }
-       // double mag=Math.sqrt(delx*delx+dely*dely);
         
 
 
-        fireList.add(new Fire((float)spawnX,(float)spawnY,(float)1,(float)angle));
+        fireList.add(new Fire((float)spawnX,(float)spawnY,(float)mag,(float)angle));
     }
 
+    @Override
+    void handleActorCollisionX(Actor i)
+    {
+        if(biting&i.isVulnerable())
+        {
+            m=i.getMode();
+        }
+    }
     void setMouseLoc(Point p)
     {
     synchronized(lock)
@@ -211,7 +251,7 @@ public final class Wrinkle extends Actor {
         mouseLoc=p;
         }
     }
-    void breatheFire(Point p)
+    void clickAction(Point p)
     {
        if(m==JobMode.dragon)
        {
@@ -222,9 +262,24 @@ public final class Wrinkle extends Actor {
             }
        }
     }
+    void keyAction()
+    {
+        if(m==JobMode.normal)
+        {
+            biting=true;
+        }
+    }
+    void unKeyAction()
+    {
+        biting=false;
+    }
     void unBreatheFire()
     {
         breathingFire=false;
+    }
+    void unJob()
+    {
+        m=JobMode.normal;
     }
 
     @Override
@@ -270,10 +325,22 @@ public final class Wrinkle extends Actor {
         {
             state=State.action;
         }
+        if(biting)
+        {
+            state=State.biting;
+        }
     }
     @Override
     void updateAnim()
     {
+        if(m==JobMode.normal)
+        {
+            currentSet=normal;
+        }
+        if(m==JobMode.dragon)
+        {
+            currentSet=d;
+        }
         super.updateAnim();
     }
 }

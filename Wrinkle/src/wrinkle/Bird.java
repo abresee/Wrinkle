@@ -14,10 +14,12 @@ import java.awt.Graphics2D;
 public final class Bird extends Enemy
 {
     
+    
     Bird(Wrinkle wrinkle,int X, int Y)
     {
         super(wrinkle,"bird",X,Y);
         health=3;
+        m=JobMode.bird;
     }
 
     protected void idleScript()
@@ -36,9 +38,13 @@ public final class Bird extends Enemy
     }
     protected void activeScript()
     {
+         if(onTheGround)
+         {
             boolean cond=((wrinkle.getX()-x)>0);
             velX=(float)(.3*((cond)?1:-1));
             facingLeft=!cond;
+            jump();
+         }
         
     }
     
@@ -51,10 +57,6 @@ public final class Bird extends Enemy
         if(!active)
         {
         facingLeft=!facingLeft;
-        }
-        else
-        {
-            jump();
         }
     }
 
@@ -74,13 +76,5 @@ public final class Bird extends Enemy
          if (Math.abs(velY) > maxVelY) {
             velY = (velY < 0) ? -maxVelY : maxVelY;
         }
-
     }
-
-//    void die()
-//    {
-//        super.die();
-//    }
-    
-    
 }

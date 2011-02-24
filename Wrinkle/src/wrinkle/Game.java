@@ -47,7 +47,12 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
                 l.goRight();
             } else if (key == Config.MoveLeft) {
                 l.goLeft();
-            } 
+            } else if (key == Config.Action){
+                l.keyAction();
+            } else if (key == Config.UnJob)
+            {
+                l.unJob();
+            }
          }
     }
 
@@ -61,7 +66,7 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
             } else if (key == Config.MoveLeft) {
                 l.unGoLeft();
             } else if (key == Config.Action) {
-                l.unBreatheFire();
+                l.unKeyAction();
             }
         }
     }
@@ -79,7 +84,7 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
     }
     public void mousePressed(MouseEvent e)
     {
-        l.breatheFire(e.getPoint());
+        l.clickAction(e.getPoint());
     }
     public void mouseReleased(MouseEvent e)
     {

@@ -16,7 +16,7 @@ import java.awt.Graphics2D;
 
 enum State {
 
-        running, jumping, idle, action, sleeping
+        running, jumping, idle, action, sleeping,biting
     };
 /**
  * Abstract superclass of game actors -- that is, objects that have animations,
@@ -38,6 +38,12 @@ public abstract class Actor extends ActiveCollidable {
     protected Clip walk1;
     protected Clip walk2;
     protected Clip land;
+    protected JobMode m;
+
+    JobMode getMode()
+    {
+        return m;
+    }
 
     void hurt() throws DeadException {
         if(!recovering)
@@ -60,7 +66,13 @@ public abstract class Actor extends ActiveCollidable {
             float accelX_, float accelY_) {
 
         super(X, Y, velX_, velY_, accelX_, accelY_);
+        try{
         normal = new AnimationSet(str);
+        }
+        catch(Exception e)
+        {
+         e.printStackTrace();
+        }
         currentSet = normal;
         initSounds(str);
         state=State.idle;
@@ -106,8 +118,13 @@ public abstract class Actor extends ActiveCollidable {
         setXtoEdge(i);
     }
 
-    void handleActorCollisionX(Actor i) {
+    void handleActorCollisionX(Actor i) throws DeadException
+    {
         setXtoEdge(i);
+        if(isPlayer()&&i.isEnemy())
+        {
+            hurt();
+        }
     }
 
     void setXtoEdge(Collidable i) {
@@ -121,31 +138,39 @@ public abstract class Actor extends ActiveCollidable {
     void handleTerrainCollisionY(Terrain i) {
         if (velY > 0) {
             if (!ignoreCollision) {
-                if (!onTheGround) {
-                    onTheGround = true;
-                    playClip(land);
-                }
-                velY = 0;
-                y = i.getY() - curSprite.getHeight();
+                collideAbove(i);
             }
         } else {
             ignoreCollision = true;
         }
     }
 
-    void handleActorCollisionY(Actor i) throws DeadException {
-        if (y < i.getY()) {
-            if (!ignoreCollision) {
-                if (!onTheGround) {
+    void collideAbove(Collidable i)
+    {
+        if (!onTheGround) {
                     onTheGround = true;
                     playClip(land);
                 }
                 velY = 0;
                 y = i.getY() - curSprite.getHeight();
+    }
+
+
+    void handleActorCollisionY(Actor i) throws DeadException {
+        if (y < i.getY()) {
+            if (!ignoreCollision) {
+               collideAbove(i);
             }
 
         } else {
+            if(isPlayer()&&i.isEnemy()&&!isBiting())
+            {
             hurt();
+            }
+            else if(isBiting())
+            {
+                i.bitten();
+            }
         }
     }
 
@@ -235,4 +260,10 @@ public abstract class Actor extends ActiveCollidable {
     {
         return health;
     }
+
+    abstract boolean isPlayer();
+    abstract boolean isEnemy();
+    abstract boolean isBiting();
+    boolean isVulnerable(){return false;}
+    abstract void bitten() throws DeadException;
 }

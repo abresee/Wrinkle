@@ -70,15 +70,12 @@ public final class Fire extends ActiveCollidable{
         //scaleFactor=frame*0.05f+.5f;
         
     }
-    
+    @Override
     void die()
     {
         dead=true;
     }
-    void hurt()
-    {
-
-    }
+    
     
     @Override
     void draw(Graphics2D g)
