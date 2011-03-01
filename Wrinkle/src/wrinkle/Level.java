@@ -12,12 +12,12 @@ import java.awt.*;
 
 
 import java.awt.image.BufferedImage;
-import javax.sound.sampled.*;
 import java.awt.geom.AffineTransform;
-
+import java.awt.Font;
 import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 import java.io.File;
+import javax.media.*;
 
 /**
  * Class representing the actual game simulation itself. 
@@ -31,20 +31,20 @@ public class Level {
     private BufferedImage buff;
     private BufferedImage heartFilled;
     private BufferedImage heartUnfilled;
+    private BufferedImage lifebird;
+    private BufferedImage lifedragon;
+    private BufferedImage lifenormal;
     private Graphics2D buffg;
     private AffineTransform at;
+    private int lives;
+    private Player bgmbase;
+    private Player bgmbirdlayer;
 
-    public Level() {
-//        try{
-//        bgm=Global.makeClip("Data/audio/bgm.wav");
-//        }
-//        catch(Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//        bgm.loop(Clip.LOOP_CONTINUOUSLY);
+    public Level(int lives_) {
 
 
+
+        lives=lives_;
         at = new AffineTransform();
 
         gameObjects = new GameObjects();
@@ -57,9 +57,22 @@ public class Level {
             backgrounds[0] = ImageIO.read(new File(prefix + "background/bg3.png"));
             heartFilled = ImageIO.read(new File(prefix + "hud/heartFilled.png"));
             heartUnfilled = ImageIO.read(new File(prefix + "hud/heartUnfilled.png"));
+            lifebird = ImageIO.read(new File(prefix + "hud/lifebird.png"));
+            lifedragon = ImageIO.read(new File(prefix+"hud/lifedragon.png"));
+            lifenormal = ImageIO.read(new File(prefix+"hud/lifenormal.png"));
+
+            File bgm=new File("Data/audio/bgm_base.wav");
+            File bgm2=new File("Data/audio/bgm_flute.wav");
+            bgmbase=Manager.createRealizedPlayer(bgm.toURI().toURL());
+            bgmbirdlayer=Manager.createRealizedPlayer(bgm2.toURI().toURL());
+            bgmbase.prefetch();
+            bgmbirdlayer.prefetch();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        bgmbase.prefetch();
+        bgmbirdlayer.prefetch();
+        bgmbase.start();
 
         buff = new BufferedImage(Global.WinX, Global.WinY, BufferedImage.TYPE_INT_RGB);
         buffg = buff.createGraphics();
@@ -86,10 +99,7 @@ public class Level {
         return wrinkle;
     }
 
-    void Jump() {
-        wrinkle.jump();
-    }
-
+    
     void goRight() {
         wrinkle.goRight();
     }
@@ -99,6 +109,7 @@ public class Level {
     }
 
     void jump() {
+        System.out.print("jumpin");
         wrinkle.jump();
     }
 
@@ -181,17 +192,57 @@ public class Level {
         {
             BufferedImage draw=(i<hearts)?heartFilled:heartUnfilled;
             buffg.drawImage(draw,0+i*draw.getWidth(),0,null);
-
         }
+        
+        BufferedImage l;
+        switch(wrinkle.getMode())
+        {
+            case dragon:
+                l=lifedragon;
+                break;
+            case bird:
+                l=lifebird;
+                break;
+            case normal:
+                l=lifenormal;
+                break;
+            default:
+                l=lifenormal;
+                break;
+        }
+        buffg.drawImage(l, 670,0, null);
+        buffg.setFont(new Font("Serif", 0, 35));
+        buffg.drawString(""+lives, 747, 26);
     }
 
     void go() throws DeadException {
 
         gameObjects.update();
+        try{
         wrinkle.update(gameObjects);
-
+        }
+        catch(DeadException e)
+        {
+            bgmbase.stop();
+            bgmbirdlayer.stop();
+            throw e;
+        }
+        if(wrinkle.getMode()==JobMode.bird)
+        {
+            if(!(bgmbirdlayer.getState()==Player.Started))
+            {
+            bgmbirdlayer.setMediaTime(bgmbase.getMediaTime());
+            bgmbirdlayer.start();
+            }
+        }
+        else
+        {
+            bgmbirdlayer.stop();
+        }
         drawBackground();
         drawForeground();
 
     }
 }
+
+

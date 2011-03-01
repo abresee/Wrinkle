@@ -9,7 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 import java.io.File;
-/**
+/**this class represents the fire that wrinkle breathes in dragon mode
  *
  * @author a.bresee
  */
@@ -17,7 +17,6 @@ public final class Fire extends ActiveCollidable{
 
     private double angle;
     private static BufferedImage FireSprite;
-    //private float scaleFactor;
 
     private static boolean spriteInit=false;
    
@@ -29,7 +28,6 @@ public final class Fire extends ActiveCollidable{
         angle=angle_;
 
         initImages();
-        //scaleFactor=.5f;
         Graphics2D g=curSprite.createGraphics();
         g.rotate(angle,FireSprite.getWidth()/2,FireSprite.getHeight()/2);
         g.drawImage(FireSprite,0,0,null);
@@ -59,7 +57,6 @@ public final class Fire extends ActiveCollidable{
     @Override
     void update(GameObjects go) throws DeadException
     {
-       // e.println("fire x: "+x+"\nfire y: "+y);
         super.update(go);
         if((x-Global.OffsetX>Global.WinX)||x-Global.OffsetX<0
                 ||(y-Global.OffsetY>Global.WinY)||(y-Global.OffsetY)<0)
@@ -67,7 +64,6 @@ public final class Fire extends ActiveCollidable{
             die();
         }
         frame++;
-        //scaleFactor=frame*0.05f+.5f;
         
     }
     @Override
@@ -82,7 +78,6 @@ public final class Fire extends ActiveCollidable{
     {
         AffineTransform at=g.getTransform();
         g.translate((double)getWidth()/2, (double)getHeight()/2);
-       // g.scale(scaleFactor,scaleFactor);
 
         super.draw(g);
         g.setTransform(at);

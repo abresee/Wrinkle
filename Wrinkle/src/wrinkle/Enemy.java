@@ -19,9 +19,12 @@ abstract public class Enemy extends Actor{
     protected Wrinkle wrinkle;
     protected boolean vulnerable=false;
     private final int waittime=100;
-    static LookupOp luo;
-    private int vulncount;
 
+
+    private int vulncount;
+    //this buisness with the look-up-op is for rendering when the enemy is vulnerable
+    //see the draw method below
+    static LookupOp luo;
 
     static
     {
@@ -33,20 +36,13 @@ abstract public class Enemy extends Actor{
         short[][] data = new short[][]{r,g,b,a};
         for (int i = 0; i < size; ++i)
         {
-            r[i] = (short)(255);
-            g[i] = (short)(0);
+            r[i] = (short)(255); //red channel is maxed for all i
+            g[i] = (short)(0); //green and blue channels are 0
             b[i]= (short)(0);
-            a[i] = (short)(i);
+            a[i] = (short)(i); //alpha is presevered.
         }
 
         ShortLookupTable l=new ShortLookupTable(0,data);
-        for(short[] i : l.getTable())
-        {
-            for(short j : i)
-            {
-                System.out.println(j);
-            }
-        }
         luo=new LookupOp(l, null);
     }
 
@@ -61,9 +57,10 @@ abstract public class Enemy extends Actor{
     @Override
     void update(GameObjects go) throws DeadException
     {
-        if(Math.abs(x-wrinkle.getX())<300||recovering)
+        if(Math.abs(x-wrinkle.getX())<300||recovering) //if wrinkle is close
+                                                       //of the enemy is under attack,
         {
-            active=true;
+            active=true;    //activate
         }
         else
         {
@@ -71,16 +68,16 @@ abstract public class Enemy extends Actor{
         }
         if(active)
         {
-            activeScript();
+            activeScript(); //if the enemy is active, behave actively
         }
         else
         {
-            idleScript();
+            idleScript(); //idle otherwise
         }
         super.update(go);
         if(vulnerable)
         {
-            vulncount++;
+            vulncount++; //increment the variable representing how long vuln
 
         }
     }
@@ -109,7 +106,7 @@ abstract public class Enemy extends Actor{
     @Override
     void draw(Graphics2D g)
     {
-        if(vulnerable&&vulncount/5%5==0)
+        if(vulnerable&&vulncount/5%5==0) //only sometimes do we apply the op
         {
 
             g.drawImage(curSprite, luo, (int)x, (int)y);

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 /**
- *
+ * This class contains all the animation information for the dragon.
+ * It has a static AnimationCollection to prevent multiply loading images.
  * @author alex
  */
 public class DragonAnimationSet extends AnimationSet{
@@ -27,11 +28,13 @@ public class DragonAnimationSet extends AnimationSet{
         rightSleep=new ArrayList<BufferedImage>();
         leftSleep=new ArrayList<BufferedImage>();
         try{
-            for(int i=0;i<Global.framecount;++i)
+            for(int i=0;i<3;++i)
             {
                 rightSleep.add(ImageIO.read(new File(str+"rightsleep"+i+".png")));
                 leftSleep.add(ImageIO.read(new File(str+"leftsleep"+i+".png")));
             }
+            rightSleep.add(rightSleep.get(1));
+            leftSleep.add(leftSleep.get(1));
         }
         catch(Exception e)
         {

@@ -6,7 +6,11 @@
 package wrinkle;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.event.*;
+import java.awt.event.*;
 import java.awt.Insets;
+import java.io.IOException;
 
 /**
  *Class that initializes the Frame and serves as the entry point for the 
@@ -14,14 +18,8 @@ import java.awt.Insets;
  *@author a.bresee
  */
 public class Main {  
-    
-    public static void main(String[] args) {
-        
-    JFrame window=new JFrame("Wrinkle... th-t-the Dinosaur!");
-       Game g;
-       
-              
-            g=new Game();
+    static void init(JFrame window, Pan g) 
+        {
 
             window.add(g);
             window.getContentPane().add(g);
@@ -36,13 +34,42 @@ public class Main {
             window.addKeyListener(g);
             window.addMouseListener(g);
             window.addMouseMotionListener(g);
+        }
+    public static void main(String[] args) throws IOException {
+        
+        
+        
+    JFrame window=new JFrame("Wrinkle... th-t-the Dinosaur!");
+//
+//            Menu m;
+//
+//            m = new Menu();
+//
+//
+//            init(window,m);
+//
+//            while(m.exists())
+//            {
+//                //spin
+//            }
+//            window.removeAll();
+    
+            Game g=new Game();
+
+            init(window,g);
+
             int lives=3;
             do{
-                g.go();
+                g.go(lives);
                 --lives;
             }while(lives>0);
             window.dispose();
             
     }
+
+}
+
+abstract class Pan extends JPanel implements KeyListener, MouseInputListener
+{
 
 }

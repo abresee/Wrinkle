@@ -8,9 +8,7 @@
  */
 package wrinkle;
 
-import java.awt.image.BufferedImage;
 import javax.sound.sampled.*;
-import java.awt.geom.*;
 import java.awt.Graphics2D;
 
 
@@ -28,22 +26,60 @@ public abstract class Actor extends ActiveCollidable {
     
     protected State state;
     protected int health;
+
+    /**flag that indicates the actor was just injured and is invulnerable for a period*/
     protected boolean recovering;
+
     protected int recoverCount;
+    
+    /**initial y velocity of an actor's jump*/
+    protected float jumpVel;
+
     /**set to false if sound initialization doesn't complete*/
     private boolean soundImplemented;
     AnimationSet set;
+
     protected Clip jumpsnd;
     protected Clip walk1;
     protected Clip walk2;
     protected Clip land;
+
+    /** represents character class of the actor*/
     protected JobMode m;
+
+    
+
+    Actor(String str, float X, float Y) {
+        this(str, X, Y, 0, 0, 0, Global.gravity);
+    }
+
+    Actor(String str, float X, float Y, float velX_, float velY_,
+            float accelX_, float accelY_) {
+
+        super(X, Y, velX_, velY_, accelX_, accelY_);
+        initSounds(str);
+        state=State.idle;
+    }
+
+    /**this is just a subroutine to make things cleaner*/
+    final void initSounds(String str) {
+        String prefix = "Data/audio/" + str + "/";
+        try {
+            jumpsnd = Global.makeClip(prefix + "jump.wav");
+            walk1 = Global.makeClip(prefix + "walk1.wav");
+            walk2 = Global.makeClip(prefix + "walk2.wav");
+            land = Global.makeClip(prefix + "land.wav");
+            soundImplemented = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     JobMode getMode()
     {
         return m;
     }
-
+    /**this method is called whenever the actor takes damage*/
     void hurt() throws DeadException {
         if(!recovering)
         {
@@ -56,54 +92,19 @@ public abstract class Actor extends ActiveCollidable {
             }
         }
     }
-
-    Actor(String str, float X, float Y) {
-        this(str, X, Y, 0, 0, 0, Global.gravity);
-    }
-
-    Actor(String str, float X, float Y, float velX_, float velY_,
-            float accelX_, float accelY_) {
-
-        super(X, Y, velX_, velY_, accelX_, accelY_);
-        try{
-        }
-        catch(Exception e)
-        {
-         e.printStackTrace();
-        }
-        
-        initSounds(str);
-        state=State.idle;
-        
-    }
-
-    /**this is just a subroutine to make things cleaner*/
-    /**this is just a subroutine to make things cleaner*/
-    final void initSounds(String str) {
-
-        String prefix = "Data/audio/" + str + "/";
-
-        try {
-            jumpsnd = Global.makeClip(prefix + "jump.wav");
-            walk1 = Global.makeClip(prefix + "walk1.wav");
-            walk2 = Global.makeClip(prefix + "walk2.wav");
-            land = Global.makeClip(prefix + "land.wav");
-            soundImplemented = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
+    
     void jump() {
         if (onTheGround) {
             playClip(jumpsnd);
-            velY = -1.5f;
+            velY = jumpVel;
             accelY = Global.gravity;
             onTheGround = false;
         }
     }
     @Override
+    /**called to draw the actor -- only draws every third frame if the character
+     * is recovering.
+     */
     void draw(Graphics2D g)
     {
     if(recoverCount%3==0)
@@ -111,10 +112,16 @@ public abstract class Actor extends ActiveCollidable {
         super.draw(g);
         }
     }
+
+    /**called when a collision is detected with a terrain object in the x direciton
+     *
+     * @param i is the terrain object
+     * test
+     */
     void handleTerrainCollisionX(Terrain i) {
         setXtoEdge(i);
     }
-
+    /**called when a collision is detected with an actor objection in the x direction*/
     void handleActorCollisionX(Actor i) throws DeadException
     {
         setXtoEdge(i);
@@ -123,7 +130,7 @@ public abstract class Actor extends ActiveCollidable {
             hurt();
         }
     }
-
+    /**matches up the current x value with the Collidable at hand's x value*/
     void setXtoEdge(Collidable i) {
         float otherx = i.getX();
         //set x to be either the right edge of the collidable,
@@ -131,7 +138,7 @@ public abstract class Actor extends ActiveCollidable {
         x = i.getX() + ((x < otherx) ? -curSprite.getWidth()
                 : i.getWidth());
     }
-
+     /**called when a collision is detected with an actor objection in the y direction*/
     void handleTerrainCollisionY(Terrain i) {
         if (velY > 0) {
             if (!ignoreCollision) {
@@ -141,7 +148,7 @@ public abstract class Actor extends ActiveCollidable {
             ignoreCollision = true;
         }
     }
-
+    /**called when landing on top of collidables*/
     void collideAbove(Collidable i)
     {
         if (!onTheGround) {
@@ -152,7 +159,7 @@ public abstract class Actor extends ActiveCollidable {
                 y = i.getY() - curSprite.getHeight();
     }
 
-
+    /**matches up the current x value with the Collidable at hand's x value*/
     void handleActorCollisionY(Actor i) throws DeadException {
         if (y < i.getY()) {
             if (!ignoreCollision) {

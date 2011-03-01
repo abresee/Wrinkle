@@ -6,7 +6,7 @@
 package wrinkle;
 
 /**
- *
+ *currently unused
  * @author alex
  */
 public class EnemyAnimationSet {

@@ -4,7 +4,6 @@
  */
 package wrinkle;
 
-import javax.swing.JPanel;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
@@ -14,11 +13,12 @@ import java.awt.event.*;
  *
  * @author alex
  */
-public class Game extends JPanel implements KeyListener,MouseListener,MouseMotionListener
+public class Game extends Pan 
 {
 
     Level l;
     BufferedImage q;
+    
 
     Game()
     {
@@ -42,6 +42,7 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
          if(l!=null)
          {
             if (key == Config.Jump) {
+                //System.out.print("jump");
                 l.jump();
             } else if (key == Config.MoveRight) {
                 l.goRight();
@@ -91,9 +92,9 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
         l.unBreatheFire();
     }
 
-    public boolean go()
+    public boolean go(int lives)
     {
-        l = new Level();
+        l = new Level(lives);
         q = l.getImage();
         while (true)
         {
