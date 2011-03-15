@@ -65,13 +65,12 @@ public class Level {
             File bgm2=new File("Data/audio/bgm_flute.wav");
             bgmbase=Manager.createRealizedPlayer(bgm.toURI().toURL());
             bgmbirdlayer=Manager.createRealizedPlayer(bgm2.toURI().toURL());
-            bgmbase.prefetch();
-            bgmbirdlayer.prefetch();
         } catch (Exception e) {
             e.printStackTrace();
         }
         bgmbase.prefetch();
         bgmbirdlayer.prefetch();
+        
         bgmbase.start();
 
         buff = new BufferedImage(Global.WinX, Global.WinY, BufferedImage.TYPE_INT_RGB);
@@ -91,6 +90,7 @@ public class Level {
         gameObjects.add(new Terrain(1200, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Terrain(1800, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Bird(wrinkle, 600, 300));
+        gameObjects.add(new Bird(wrinkle, 800, 300));
         gameObjects.add(new Dragon(wrinkle, 1200, Global.GroundLevel));
         gameObjects.add(new Terrain(-400, -Global.WinY, 400, 3*Global.WinY, Color.DARK_GRAY));
     }
@@ -214,25 +214,45 @@ public class Level {
         buffg.setFont(new Font("Serif", 0, 35));
         buffg.drawString(""+lives, 747, 26);
     }
+    void collide()
+    {
 
+    }
     void go() throws DeadException {
 
         gameObjects.update();
         try{
         wrinkle.update(gameObjects);
         }
+
         catch(DeadException e)
         {
-            bgmbase.stop();
-            bgmbirdlayer.stop();
+            bgmbase.close();
+            bgmbirdlayer.close();
             throw e;
+        }
+        gameObjects.moveX();
+        wrinkle.moveX();
+        collide();
+        if(bgmbase.getState()==Player.Prefetched)
+        {
+            bgmbase.setMediaTime(new Time(0));
+            bgmbirdlayer.setMediaTime(new Time(0));
+            bgmbase.start();
+            bgmbirdlayer.start();
         }
         if(wrinkle.getMode()==JobMode.bird)
         {
-            if(!(bgmbirdlayer.getState()==Player.Started))
+            if(( !(bgmbirdlayer.getState()==Player.Started) ) &&
+                    (bgmbase.getState()==Player.Started) )
             {
-            bgmbirdlayer.setMediaTime(bgmbase.getMediaTime());
-            bgmbirdlayer.start();
+                System.out.println("heh");
+                bgmbirdlayer.setMediaTime(bgmbase.getMediaTime());
+                bgmbirdlayer.start();
+                if(bgmbirdlayer.getState()==Player.Started)
+                {
+                    System.out.println("cool");
+                }
             }
         }
         else

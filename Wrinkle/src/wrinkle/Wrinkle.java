@@ -274,9 +274,9 @@ public final class Wrinkle extends Actor {
     }
 
     @Override
-    void update(GameObjects go) throws DeadException
+    void update() throws DeadException
     {
-        super.update(go);
+        super.update();
         if(breathingFire)
         {
             fire();
@@ -286,14 +286,12 @@ public final class Wrinkle extends Actor {
         {
             if(!i.isDead())
             {
-                i.update(go);
+                i.update();
                 bab2.add(i);
             }
 
         }
-        
         fireList=bab2;
-        
         correctOffsets();
     }
     @Override

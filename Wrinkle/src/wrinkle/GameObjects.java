@@ -69,10 +69,17 @@ class GameObjects
         {
             if(!i.isDead())
             {
-                i.update(this);
+                i.update();
                 newActors.add(i);
             }
         }
         actors=newActors;
+    }
+    void moveX()
+    {
+        for(Actor i:actors)
+        {
+            i.moveX();
+        }
     }
 }

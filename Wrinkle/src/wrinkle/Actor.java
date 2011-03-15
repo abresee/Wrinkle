@@ -264,7 +264,23 @@ public abstract class Actor extends ActiveCollidable {
     {
         return health;
     }
-
+    void moveX()
+    {
+        x+=velX*Global.timeStep;
+    }
+    void unMoveX()
+    {
+        x-=velX*Global.timeStep;
+    }
+    void moveY()
+    {
+        y+=velY*Global.timeStep;
+    }
+    void unMoveY()
+    {
+        y-=velY*Global.timeStep;
+    }
+    
     abstract boolean isPlayer();
     abstract boolean isEnemy();
     abstract boolean isBiting();
