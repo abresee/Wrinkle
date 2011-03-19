@@ -7,7 +7,7 @@ package wrinkle;
 import javax.swing.JPanel;
 import java.awt.Graphics;
 /**
- *configuration menu. as-yet-unimplemented.
+ *
  * @author alex
  */
 public class ConfigMenu extends JPanel

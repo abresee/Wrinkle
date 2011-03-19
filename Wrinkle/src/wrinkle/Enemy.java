@@ -19,12 +19,9 @@ abstract public class Enemy extends Actor{
     protected Wrinkle wrinkle;
     protected boolean vulnerable=false;
     private final int waittime=100;
-
-
-    private int vulncount;
-    //this buisness with the look-up-op is for rendering when the enemy is vulnerable
-    //see the draw method below
     static LookupOp luo;
+    private int vulncount;
+
 
     static
     {
@@ -36,10 +33,10 @@ abstract public class Enemy extends Actor{
         short[][] data = new short[][]{r,g,b,a};
         for (int i = 0; i < size; ++i)
         {
-            r[i] = (short)(255); //red channel is maxed for all i
-            g[i] = (short)(0); //green and blue channels are 0
+            r[i] = (short)(255);
+            g[i] = (short)(0);
             b[i]= (short)(0);
-            a[i] = (short)(i); //alpha is presevered.
+            a[i] = (short)(i);
         }
 
         ShortLookupTable l=new ShortLookupTable(0,data);
@@ -57,10 +54,9 @@ abstract public class Enemy extends Actor{
     @Override
     void update(GameObjects go) throws DeadException
     {
-        if(Math.abs(x-wrinkle.getX())<300||recovering) //if wrinkle is close
-                                                       //of the enemy is under attack,
+        if(Math.abs(x-wrinkle.getX())<300||recovering)
         {
-            active=true;    //activate
+            active=true;
         }
         else
         {
@@ -68,16 +64,16 @@ abstract public class Enemy extends Actor{
         }
         if(active)
         {
-            activeScript(); //if the enemy is active, behave actively
+            activeScript();
         }
         else
         {
-            idleScript(); //idle otherwise
+            idleScript();
         }
         super.update(go);
         if(vulnerable)
         {
-            vulncount++; //increment the variable representing how long vuln
+            vulncount++;
 
         }
     }
@@ -106,7 +102,7 @@ abstract public class Enemy extends Actor{
     @Override
     void draw(Graphics2D g)
     {
-        if(vulnerable&&vulncount/5%5==0) //only sometimes do we apply the op
+        if(vulnerable&&vulncount/5%5==0)
         {
 
             g.drawImage(curSprite, luo, (int)x, (int)y);

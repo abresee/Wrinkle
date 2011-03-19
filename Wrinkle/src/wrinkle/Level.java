@@ -13,11 +13,10 @@ import java.awt.*;
 
 import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
-import java.awt.Font;
+import java.util.ArrayList;
 import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 import java.io.File;
-import javax.media.*;
 
 /**
  * Class representing the actual game simulation itself. 
@@ -31,24 +30,20 @@ public class Level {
     private BufferedImage buff;
     private BufferedImage heartFilled;
     private BufferedImage heartUnfilled;
-    private BufferedImage lifebird;
-    private BufferedImage lifedragon;
-    private BufferedImage lifenormal;
     private Graphics2D buffg;
     private AffineTransform at;
-    private int lives;
-    private Player bgmbase;
-    private Player bgmbirdlayer;
+    BGMHandler bgm;
 
-    public Level(int lives_) {
+    public Level() {
 
-
-
-        lives=lives_;
         at = new AffineTransform();
 
         gameObjects = new GameObjects();
-
+        ArrayList<String> bgms=new ArrayList<String>();
+        bgms.add("Data/audio/bgm/");
+        bgms.add("base");
+        bgms.add("dragon");
+        bgms.add("bird");
         String prefix = "Data/Images/";
         backgrounds = new BufferedImage[3];
         try {
@@ -57,21 +52,10 @@ public class Level {
             backgrounds[0] = ImageIO.read(new File(prefix + "background/bg3.png"));
             heartFilled = ImageIO.read(new File(prefix + "hud/heartFilled.png"));
             heartUnfilled = ImageIO.read(new File(prefix + "hud/heartUnfilled.png"));
-            lifebird = ImageIO.read(new File(prefix + "hud/lifebird.png"));
-            lifedragon = ImageIO.read(new File(prefix+"hud/lifedragon.png"));
-            lifenormal = ImageIO.read(new File(prefix+"hud/lifenormal.png"));
-
-            File bgm=new File("Data/audio/bgm_base.wav");
-            File bgm2=new File("Data/audio/bgm_flute.wav");
-            bgmbase=Manager.createRealizedPlayer(bgm.toURI().toURL());
-            bgmbirdlayer=Manager.createRealizedPlayer(bgm2.toURI().toURL());
+            bgm=new BGMHandler(bgms);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        bgmbase.prefetch();
-        bgmbirdlayer.prefetch();
-        
-        bgmbase.start();
 
         buff = new BufferedImage(Global.WinX, Global.WinY, BufferedImage.TYPE_INT_RGB);
         buffg = buff.createGraphics();
@@ -90,7 +74,6 @@ public class Level {
         gameObjects.add(new Terrain(1200, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Terrain(1800, Global.GroundLevel, 400, 400, Color.GREEN));
         gameObjects.add(new Bird(wrinkle, 600, 300));
-        gameObjects.add(new Bird(wrinkle, 800, 300));
         gameObjects.add(new Dragon(wrinkle, 1200, Global.GroundLevel));
         gameObjects.add(new Terrain(-400, -Global.WinY, 400, 3*Global.WinY, Color.DARK_GRAY));
     }
@@ -99,7 +82,10 @@ public class Level {
         return wrinkle;
     }
 
-    
+    void Jump() {
+        wrinkle.jump();
+    }
+
     void goRight() {
         wrinkle.goRight();
     }
@@ -109,7 +95,6 @@ public class Level {
     }
 
     void jump() {
-        System.out.print("jumpin");
         wrinkle.jump();
     }
 
@@ -193,76 +178,23 @@ public class Level {
             BufferedImage draw=(i<hearts)?heartFilled:heartUnfilled;
             buffg.drawImage(draw,0+i*draw.getWidth(),0,null);
         }
-        
-        BufferedImage l;
-        switch(wrinkle.getMode())
-        {
-            case dragon:
-                l=lifedragon;
-                break;
-            case bird:
-                l=lifebird;
-                break;
-            case normal:
-                l=lifenormal;
-                break;
-            default:
-                l=lifenormal;
-                break;
-        }
-        buffg.drawImage(l, 670,0, null);
-        buffg.setFont(new Font("Serif", 0, 35));
-        buffg.drawString(""+lives, 747, 26);
     }
-    void collide()
-    {
 
-    }
     void go() throws DeadException {
 
-        gameObjects.update();
         try{
+        gameObjects.update();
         wrinkle.update(gameObjects);
         }
-
         catch(DeadException e)
         {
-            bgmbase.close();
-            bgmbirdlayer.close();
+            bgm.closeAll();
             throw e;
         }
-        gameObjects.moveX();
-        wrinkle.moveX();
-        collide();
-        if(bgmbase.getState()==Player.Prefetched)
-        {
-            bgmbase.setMediaTime(new Time(0));
-            bgmbirdlayer.setMediaTime(new Time(0));
-            bgmbase.start();
-            bgmbirdlayer.start();
-        }
-        if(wrinkle.getMode()==JobMode.bird)
-        {
-            if(( !(bgmbirdlayer.getState()==Player.Started) ) &&
-                    (bgmbase.getState()==Player.Started) )
-            {
-                System.out.println("heh");
-                bgmbirdlayer.setMediaTime(bgmbase.getMediaTime());
-                bgmbirdlayer.start();
-                if(bgmbirdlayer.getState()==Player.Started)
-                {
-                    System.out.println("cool");
-                }
-            }
-        }
-        else
-        {
-            bgmbirdlayer.stop();
-        }
+        bgm.change(wrinkle.getModeString());
+        bgm.step();
         drawBackground();
         drawForeground();
 
     }
 }
-
-

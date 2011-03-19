@@ -5,7 +5,6 @@
 
 package wrinkle;
 /**
- * A piece of terrain that is not ever drawn, that kills the player on contact
  *
  * @author a.bresee
  */

@@ -135,10 +135,22 @@ abstract class ActiveCollidable extends Collidable {
         boolean b=collideShape.intersects(c.getbBox());
         return b;
     }
-     void update() throws DeadException
+     void update(GameObjects go) throws DeadException
     {
 
-        updateVel();                    
+        updateVel();
+        float dely = velY * Global.timeStep;
+        try{
+        tryMoveY(dely,go);
+        
+        float delx = velX * Global.timeStep;
+        tryMoveX(delx,go);
+        }
+        catch (DeadException e)
+        {
+            throw e;
+        }
+       
 
         updateState();
 
@@ -148,6 +160,76 @@ abstract class ActiveCollidable extends Collidable {
 
     }
 
+void tryMoveX(float delx, GameObjects go) throws DeadException
+    {
+         x+=delx;
+
+         if(!ignoreCollision)
+         {
+             for(Terrain i:go.getTerrains())
+             {
+                 if(collidesWith(i))
+                 {
+                     handleTerrainCollisionX(i);
+                 }
+             }
+         }
+         for(DieBox i:go.getDieBoxes())
+         {
+             if(collidesWith(i))
+             {
+                 die();
+             }
+         }
+         for(Actor i:go.getActors())
+         {
+             if(this.equals(i))
+                 continue;
+             else if(collidesWith(i))
+             {
+                 handleActorCollisionX(i);
+             }
+         }
+    }
+
+
+ void tryMoveY(float delY, GameObjects go) throws DeadException
+    {
+         boolean bk = false;
+         y+=delY;
+        for (Terrain i:go.getTerrains())
+        {
+            if (collidesWith(i))
+            {
+                
+                handleTerrainCollisionY(i);
+                bk=true;
+                break;
+            }
+        }
+        for(DieBox i:go.getDieBoxes())
+         {
+             if(collidesWith(i))
+             {
+                 die();
+             }
+         }
+        for (Actor i:go.getActors())
+        {
+            if(this.equals(i))
+                continue;
+            if (collidesWith(i))
+            {
+                handleActorCollisionY(i);
+                bk=true;
+                break;
+            }
+        }
+        if (!bk) {
+            ignoreCollision = false;
+            onTheGround=false;
+        }
+    }
 
      abstract void handleTerrainCollisionX(Terrain i);
      abstract void handleActorCollisionX(Actor i) throws DeadException;

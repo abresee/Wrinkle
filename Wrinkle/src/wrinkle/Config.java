@@ -6,7 +6,7 @@
 package wrinkle;
 import java.awt.event.KeyEvent;
 /**
- *Config keys. For as-yet-unimplemented configuration menu.
+ *
  * @author alex
  */
 public class Config {

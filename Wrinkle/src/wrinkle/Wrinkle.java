@@ -35,12 +35,18 @@ public final class Wrinkle extends Actor {
 
    private final Object lock;
 
-    /**
-     *Enum to flag what 'copy mode' wrinkle is using
-     *@author a.bresee
-     */
-    
-    
+    String getModeString()
+    {
+        switch(m)
+        {
+            case bird:
+                return "bird";
+            case dragon:
+                return "dragon";
+            default:
+                return "normal";
+        }
+    }
     
     
     /**
@@ -65,8 +71,6 @@ public final class Wrinkle extends Actor {
         health=3;
         maxHealth=health;
 
-        jumpVel=-1.5f;
-
         lock = new Object();
         mouseLoc = new Point();
         curSprite = set.getNextSprite(state, facingLeft);
@@ -76,12 +80,21 @@ public final class Wrinkle extends Actor {
         return maxHealth;
     }
 
+    /**
+     *Defines behavior of "jump" action. Called when player jumps.
+     */
+
     @Override
     void die() throws DeadException
     {
         throw new DeadException();
     }
 
+   
+    /**
+     *Defines behavior of "right" action. Called when player presses the 
+     *"right" key.
+     */
     boolean isBreathingFire()
     {
         return breathingFire;
@@ -230,8 +243,6 @@ public final class Wrinkle extends Actor {
         if(biting&i.isVulnerable())
         {
             m=i.getMode();
-            try{i.die();}
-            catch(Exception e){}
 
         }
     }
@@ -274,9 +285,9 @@ public final class Wrinkle extends Actor {
     }
 
     @Override
-    void update() throws DeadException
+    void update(GameObjects go) throws DeadException
     {
-        super.update();
+        super.update(go);
         if(breathingFire)
         {
             fire();
@@ -286,12 +297,14 @@ public final class Wrinkle extends Actor {
         {
             if(!i.isDead())
             {
-                i.update();
+                i.update(go);
                 bab2.add(i);
             }
 
         }
+        
         fireList=bab2;
+        
         correctOffsets();
     }
     @Override

@@ -22,7 +22,6 @@ public final class Bird extends Enemy
         health=3;
         m=JobMode.bird;
         curSprite = set.getNextSprite(state, facingLeft);
-        jumpVel=-.7f;
     }
 
     protected void idleScript()

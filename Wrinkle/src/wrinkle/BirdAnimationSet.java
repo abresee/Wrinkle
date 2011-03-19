@@ -5,9 +5,7 @@
 
 package wrinkle;
 import java.awt.image.BufferedImage;
-/**this class contains a static animation collection -- this way, no matter how many
- * enemies are spawned, the disk is only accessed once per sprite. this pattern is repeated for
- * all enemy animation sets.
+/**
  *
  * @author alex
  */

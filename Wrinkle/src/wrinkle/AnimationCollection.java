@@ -12,10 +12,6 @@ import java.util.ArrayList;
  *
  * @author alex
  */
-/**This class encapsulates the basic sprites that an actor will have,
- *
- * @author alex
- */
 public class AnimationCollection{
 
     private ArrayList<BufferedImage> rightWalk;

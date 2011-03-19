@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
  * @author a.bresee
  */
 public class Global{
-    static final int timeStep=17;
+    static final int timeStep=20;
     static final int WinX=800;
     static final int WinY=600;
     static final int GroundLevel=500;
