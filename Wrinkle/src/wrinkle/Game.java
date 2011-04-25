@@ -4,7 +4,7 @@
  */
 package wrinkle;
 
-import javax.swing.JPanel;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
@@ -14,11 +14,12 @@ import java.awt.event.*;
  *
  * @author alex
  */
-public class Game extends JPanel implements KeyListener,MouseListener,MouseMotionListener
+public class Game extends Pan
 {
 
     Level l;
     BufferedImage q;
+    boolean levelinit;
 
     Game()
     {
@@ -34,6 +35,8 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
     public void paint(Graphics g)
     {
         Graphics2D g1=(Graphics2D)g;
+        g1.setBackground(Color.CYAN);
+        g1.clearRect(0,0,Global.WinX,Global.WinY);
         g1.drawImage(q,0,0,null);
     }
 
@@ -80,35 +83,42 @@ public class Game extends JPanel implements KeyListener,MouseListener,MouseMotio
     public void mouseMoved(MouseEvent e){}
     public void mouseDragged(MouseEvent e)
     {
-        l.setMouseLoc(e.getPoint());
+        if(levelinit)
+        {
+            l.setMouseLoc(e.getPoint());
+        }
+
     }
     public void mousePressed(MouseEvent e)
     {
-        l.clickAction(e.getPoint());
+        if(levelinit)
+        {
+            l.clickAction(e.getPoint());
+        }
     }
     public void mouseReleased(MouseEvent e)
     {
+        if(levelinit)
+        {
         l.unBreatheFire();
+        }
     }
 
-    public boolean go()
+    public boolean go(int lives)
     {
-        l = new Level();
+        l = new Level(lives);
+        levelinit=true;
         q = l.getImage();
         while (true)
         {
             long time = System.currentTimeMillis();
-            try
-            {
-                l.go();
-            }
-            catch (DeadException e)
-            {
-                return true;
-            }
+            
+            if(!l.go())
+                return false;
+                        
             paintImmediately(0,0,Global.WinX,Global.WinY);
             time = System.currentTimeMillis() - time;
-            //System.out.println(time);
+           // System.out.println(time);
             if (time < Global.timeStep)
 
             {

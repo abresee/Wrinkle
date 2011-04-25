@@ -14,10 +14,26 @@ import java.awt.Graphics2D;
 public final class Bird extends Enemy
 {
     
-    
-    Bird(Wrinkle wrinkle,int X, int Y)
+   static SFX sfx;
+   static
+   {
+       try
+       {
+           sfx = new SFX("bird");
+       }
+       catch(Exception e)
+       {
+           e.printStackTrace();
+       }
+   }
+   SFX getSfx()
     {
-        super(wrinkle,"bird",X,Y);
+        return sfx;
+    }
+    
+    Bird(Wrinkle wrinkle, int X, int Y)
+    {
+        super(wrinkle, "bird",X,Y);
         set=new BirdAnimationSet();
         health=3;
         m=JobMode.bird;

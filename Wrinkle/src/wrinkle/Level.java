@@ -30,20 +30,25 @@ public class Level {
     private BufferedImage buff;
     private BufferedImage heartFilled;
     private BufferedImage heartUnfilled;
+    private BufferedImage lifebird;
+    private BufferedImage lifedragon;
+    private BufferedImage lifenormal;
     private Graphics2D buffg;
     private AffineTransform at;
-    BGMHandler bgm;
+    private int lives;
+    private BGMHandler bgm;
 
-    public Level() {
-
+    public Level(int lives_) {
+        lives=lives_;
         at = new AffineTransform();
 
         gameObjects = new GameObjects();
         ArrayList<String> bgms=new ArrayList<String>();
-        bgms.add("Data/audio/bgm/");
+        bgms.add("Data/audio/bgm/level1/");
         bgms.add("base");
         bgms.add("dragon");
         bgms.add("bird");
+        bgms.add("chameleon");
         String prefix = "Data/Images/";
         backgrounds = new BufferedImage[3];
         try {
@@ -52,6 +57,9 @@ public class Level {
             backgrounds[0] = ImageIO.read(new File(prefix + "background/bg3.png"));
             heartFilled = ImageIO.read(new File(prefix + "hud/heartFilled.png"));
             heartUnfilled = ImageIO.read(new File(prefix + "hud/heartUnfilled.png"));
+            lifebird = ImageIO.read(new File(prefix + "hud/lifebird.png"));
+            lifedragon = ImageIO.read(new File(prefix+"hud/lifedragon.png"));
+            lifenormal = ImageIO.read(new File(prefix+"hud/lifenormal.png"));
             bgm=new BGMHandler(bgms);
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,28 +70,27 @@ public class Level {
         buffg.setBackground(Color.cyan);
 
 
-        wrinkle = new Wrinkle(Global.WinX / 4 + 1, Global.WinY - 200);
 
-        gameObjects.add(new Terrain(0, Global.GroundLevel,400, 400, Color.GREEN));
+        gameObjects.addGround(0,Global.GroundLevel,20);
         gameObjects.add(new DieBox(0, Global.WinY, 5*Global.WinX, Global.WinY));
-        gameObjects.add(new Terrain(0, Global.GroundLevel,400, 400, Color.GREEN));
-        gameObjects.add(new Terrain(500, Global.GroundLevel, 300, 400, Color.RED));
-        gameObjects.add(new Terrain(300, 400, 100, 100));
-        gameObjects.add(new Terrain(200, 200, 50, 50));
-        gameObjects.add(new Terrain(Global.WinX, Global.GroundLevel, 400, 400, Color.MAGENTA));
-        gameObjects.add(new Terrain(1200, Global.GroundLevel, 400, 400, Color.GREEN));
-        gameObjects.add(new Terrain(1800, Global.GroundLevel, 400, 400, Color.GREEN));
-        gameObjects.add(new Bird(wrinkle, 600, 300));
-        gameObjects.add(new Dragon(wrinkle, 1200, Global.GroundLevel));
-        gameObjects.add(new Terrain(-400, -Global.WinY, 400, 3*Global.WinY, Color.DARK_GRAY));
+        gameObjects.add(new LogPlatform(800, 300));
+        gameObjects.add(new LogPlatform(973, 300));
+        gameObjects.add(new SpawnActor(1250,Global.GroundLevel,ActorType.Bird,gameObjects));
+        gameObjects.add(ActorType.Wrinkle,Global.WinX / 4 + 1, Global.WinY - 200);
+
+        try{
+            wrinkle=gameObjects.getWrinkle();
+        }
+        catch(NoWrinkleException e)
+        {
+            e.printStackTrace();
+        }
+       
+        
     }
 
     Wrinkle getWrinkle() {
         return wrinkle;
-    }
-
-    void Jump() {
-        wrinkle.jump();
     }
 
     void goRight() {
@@ -136,7 +143,10 @@ public class Level {
 
     void drawBackground() {
 
-        //buffg.clearRect(0,0,Global.WinX,Global.WinY);
+        buffg.setBackground(Color.GRAY);
+        buffg.clearRect(Math.round(Global.OffsetX),
+                        Math.round(Global.OffsetY),
+                        Global.WinX,Global.WinY);
 
         for (int i = 0; i < backgrounds.length; ++i) {
             float x = -(Global.coeff[i] * Global.OffsetX) % Global.WinX;
@@ -164,10 +174,9 @@ public class Level {
 
         wrinkle.draw(buffg);
         drawHUD();
-
     }
 
-    void drawHUD()
+   void drawHUD()
     {
         int hearts=wrinkle.getHealth();
         int maxHearts=wrinkle.getMaxHealth();
@@ -178,23 +187,55 @@ public class Level {
             BufferedImage draw=(i<hearts)?heartFilled:heartUnfilled;
             buffg.drawImage(draw,0+i*draw.getWidth(),0,null);
         }
+
+        BufferedImage l;
+        switch(wrinkle.getMode())
+        {
+            case dragon:
+                l=lifedragon;
+                break;
+            case bird:
+                l=lifebird;
+                break;
+            case normal:
+                l=lifenormal;
+                break;
+            default:
+                l=lifenormal;
+                break;
+        }
+        buffg.drawImage(l, 670,0, null);
+        buffg.setColor(Color.BLACK);
+        buffg.setFont(new Font("Serif", 0, 35));
+        buffg.drawString(""+lives, 747, 26);
     }
 
-    void go() throws DeadException {
-
-        try{
+    boolean go()
+    {
         gameObjects.update();
         wrinkle.update(gameObjects);
-        }
-        catch(DeadException e)
+
+        if(wrinkle.isDead())
         {
-            bgm.closeAll();
-            throw e;
+            if(lives==0)
+            {
+                bgm.closeAll();
+                return false;
+            }
+            --lives;
+            try{
+            gameObjects.reset();
+            wrinkle=gameObjects.getWrinkle();
+            }
+            catch(NoWrinkleException e)
+            {
+                e.printStackTrace();
+            }
         }
         bgm.change(wrinkle.getModeString());
         bgm.step();
         drawBackground();
         drawForeground();
-
+        return true;
     }
 }

@@ -9,7 +9,7 @@
 package wrinkle;
 import java.awt.Point;
 import java.awt.Graphics2D;
-import java.util.LinkedList;
+
 
 /**
  * Class that defines the player character
@@ -21,14 +21,31 @@ enum JobMode{normal,bird,dragon};
 public final class Wrinkle extends Actor {
 
    private boolean biting;
-   private boolean breathingFire;
    private final int maxHealth;
+   private FireHelper fhelp;
+   final int birdJumpLimit=3;
+   int birdJump=0;
 
 
    private AnimationCollection d;
+   static SFX sfx;
+   static
+   {
+       try
+       {
+           sfx = new SFX("wrinkle");
+       }
+       catch(Exception e)
+       {
+           e.printStackTrace();
+       }
+   }
+   SFX getSfx()
+    {
+        return sfx;
+    }
    
-   
-   private LinkedList<Fire> fireList;
+  
    private final Object fireListLock;
 
    private Point mouseLoc;
@@ -62,12 +79,10 @@ public final class Wrinkle extends Actor {
     Wrinkle(int X, int Y) {
         super("hero", X, Y);
         set=new WrinkleAnimationSet();
-        fireList=new LinkedList<Fire>();
+        fhelp=new FireHelper(this);
         fireListLock=new Object();
-        mass = 1;
         m=JobMode.normal;
         biting=false;
-        breathingFire=false;
         health=3;
         maxHealth=health;
 
@@ -75,29 +90,23 @@ public final class Wrinkle extends Actor {
         mouseLoc = new Point();
         curSprite = set.getNextSprite(state, facingLeft);
     }
+    
     int getMaxHealth()
     {
         return maxHealth;
     }
 
-    /**
-     *Defines behavior of "jump" action. Called when player jumps.
-     */
-
-    @Override
-    void die() throws DeadException
-    {
-        throw new DeadException();
-    }
-
    
-    /**
-     *Defines behavior of "right" action. Called when player presses the 
-     *"right" key.
-     */
+    @Override
+    void die()
+    {
+        super.die();
+        fhelp.fireOff();
+    }
+    
     boolean isBreathingFire()
     {
-        return breathingFire;
+        return fhelp.isBreathingFire();
     }
 
     boolean isBiting()
@@ -173,7 +182,7 @@ public final class Wrinkle extends Actor {
             Global.OffsetX = x - Global.WinX / 4;
         }
         
-        if (y - Global.OffsetY < (Global.WinY / 2))
+        if (y - Global.OffsetY < (Global.WinY*7/13))
         {
             Global.OffsetY = y - Global.WinY / 2;
         } 
@@ -185,57 +194,7 @@ public final class Wrinkle extends Actor {
             Global.OffsetY = (y + curSprite.getHeight()) - (Global.WinY - 50);
         }
     }
-    void fire()
-    {
-        double x_;
-        double y_;
-       synchronized(lock)
-       {
-        x_ = mouseLoc.getX()+Global.OffsetX;
-        y_ = mouseLoc.getY()+Global.OffsetY;
-       }
-        double spawnX=x-20+((facingLeft)?40:getWidth());
-        double spawnY=y+40;
-        
-        double delx = x_-spawnX;
-        double dely = y_-spawnY;
-
-        double angle=Math.atan2(dely,delx);
-        double delVelX=Math.cos(angle);
-        double delVelY=Math.sin(angle);
-        delVelX+=velX;
-        delVelY+=velY;
-        angle=Math.atan2(delVelY, delVelX);
-        double mag=Math.sqrt(delVelX*delVelX+delVelY*delVelY);
-
-        if(facingLeft)
-        {
-            if(angle>0&&angle<3*Math.PI/4)
-            {
-                angle=3*Math.PI/4;
-            }
-            else if(angle<=0&&angle>-3*Math.PI/4)
-            {
-                angle=-3*Math.PI/4;
-            }
-
-        }
-        else
-        {
-            if(angle>Math.PI/4)
-            {
-                angle=Math.PI/4;
-            }
-            else if(angle<-Math.PI/4)
-            {
-                angle=-Math.PI/4;
-            }
-        }
-        
-
-
-        fireList.add(new Fire((float)spawnX,(float)spawnY,(float)mag,(float)angle));
-    }
+    
 
     @Override
     void handleActorCollisionX(Actor i)
@@ -248,20 +207,14 @@ public final class Wrinkle extends Actor {
     }
     void setMouseLoc(Point p)
     {
-    synchronized(lock)
-        {
-        mouseLoc=p;
-        }
+        fhelp.setLoc(p);
     }
     void clickAction(Point p)
     {
        if(m==JobMode.dragon)
        {
-            breathingFire=true;
-            synchronized(lock)
-            {
-            mouseLoc=p;
-            }
+            fhelp.fireOn();
+            fhelp.setLoc(p);
        }
     }
     void keyAction()
@@ -277,53 +230,63 @@ public final class Wrinkle extends Actor {
     }
     void unBreatheFire()
     {
-        breathingFire=false;
+       fhelp.fireOff();
+    }
+    @Override
+    void jump()
+    {
+        if(m==JobMode.bird)
+        {
+            flap();
+        }
+        else
+        {
+            super.jump();
+        }
+    }
+    void flap()
+    {
+        if(birdJump<birdJumpLimit)
+        {
+            velY = -1.5f;
+            accelY = Global.gravity;
+            birdJump++;
+        }
+        else
+        {
+            onTheGround=false;
+        }
+    }
+    @Override
+    void collideAbove(Collidable i)
+    {
+        birdJump=0;
+        super.collideAbove(i);
     }
     void unJob()
     {
         m=JobMode.normal;
     }
-
+    
     @Override
-    void update(GameObjects go) throws DeadException
+    void update(GameObjects go)
     {
         super.update(go);
-        if(breathingFire)
-        {
-            fire();
-        }
-        LinkedList<Fire> bab2=new LinkedList<Fire>();
-        for(Fire i:fireList)
-        {
-            if(!i.isDead())
-            {
-                i.update(go);
-                bab2.add(i);
-            }
-
-        }
-        
-        fireList=bab2;
-        
+        fhelp.update(go);
+       
         correctOffsets();
     }
     @Override
     void draw(Graphics2D g)
     {
         super.draw(g);
-        synchronized(fireListLock)
-        {
-            for(Fire i:fireList)
-            {
-                i.draw(g);
-            }
-        }
+        fhelp.draw(g);
     }
     @Override
     void updateState()
     {
         super.updateState();
-        if(breathingFire)
+        if(isBreathingFire())
         {
             state=State.action;
         }

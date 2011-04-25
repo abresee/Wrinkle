@@ -9,7 +9,6 @@
 package wrinkle;
 
 import java.awt.image.BufferedImage;
-import javax.sound.sampled.*;
 import java.awt.geom.*;
 import java.awt.Graphics2D;
 
@@ -33,10 +32,7 @@ public abstract class Actor extends ActiveCollidable {
     /**set to false if sound initialization doesn't complete*/
     private boolean soundImplemented;
     AnimationSet set;
-    protected Clip jumpsnd;
-    protected Clip walk1;
-    protected Clip walk2;
-    protected Clip land;
+    
     protected JobMode m;
 
     JobMode getMode()
@@ -44,7 +40,8 @@ public abstract class Actor extends ActiveCollidable {
         return m;
     }
 
-    void hurt() throws DeadException {
+    void hurt()
+    {
         if(!recovering)
         {
             if (health > 0) {
@@ -71,38 +68,20 @@ public abstract class Actor extends ActiveCollidable {
         {
          e.printStackTrace();
         }
-        
-        initSounds(str);
         state=State.idle;
-        
     }
 
-    /**this is just a subroutine to make things cleaner*/
-    /**this is just a subroutine to make things cleaner*/
-    final void initSounds(String str) {
 
-        String prefix = "Data/audio/" + str + "/";
 
-        try {
-            jumpsnd = Global.makeClip(prefix + "jump.wav");
-            walk1 = Global.makeClip(prefix + "walk1.wav");
-            walk2 = Global.makeClip(prefix + "walk2.wav");
-            land = Global.makeClip(prefix + "land.wav");
-            soundImplemented = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    void jump() {
+    void jump(){
         if (onTheGround) {
-            playClip(jumpsnd);
+            getSfx().jump();
             velY = -1.5f;
             accelY = Global.gravity;
             onTheGround = false;
         }
     }
+
     @Override
     void draw(Graphics2D g)
     {
@@ -115,13 +94,18 @@ public abstract class Actor extends ActiveCollidable {
         setXtoEdge(i);
     }
 
-    void handleActorCollisionX(Actor i) throws DeadException
+    void handleActorCollisionX(Actor i)
     {
         setXtoEdge(i);
-        if(isPlayer()&&i.isEnemy())
-        {
+         if(isPlayer()&&i.isEnemy()&&!isBiting())
+            {
             hurt();
-        }
+            }
+            else if(isBiting())
+            {
+                i.bitten();
+            }
+
     }
 
     void setXtoEdge(Collidable i) {
@@ -146,14 +130,15 @@ public abstract class Actor extends ActiveCollidable {
     {
         if (!onTheGround) {
                     onTheGround = true;
-                    playClip(land);
+                    getSfx().land();
                 }
                 velY = 0;
                 y = i.getY() - curSprite.getHeight();
     }
 
 
-    void handleActorCollisionY(Actor i) throws DeadException {
+    void handleActorCollisionY(Actor i)
+    {
         if (y < i.getY()) {
             if (!ignoreCollision) {
                collideAbove(i);
@@ -247,20 +232,22 @@ public abstract class Actor extends ActiveCollidable {
      *sound
      *@param Clip is a well-formed clip, loaded with data
      */
-    void playClip(Clip clip) {
-        if (soundImplemented) {
-            clip.setFramePosition(0);
-            clip.start();
-        }
-    }
+    
     int getHealth()
     {
         return health;
     }
-
+    @Override
+    void die()
+    {
+      super.die();
+      getSfx().die();
+    }
+    
+    abstract SFX getSfx();
     abstract boolean isPlayer();
     abstract boolean isEnemy();
     abstract boolean isBiting();
     boolean isVulnerable(){return false;}
-    abstract void bitten() throws DeadException;
+    abstract void bitten();
 }

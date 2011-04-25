@@ -10,6 +10,7 @@
 package wrinkle;
 import java.awt.geom.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 /**
@@ -18,8 +19,13 @@ import java.awt.*;
  */
 public class Terrain extends StaticCollidable
 {
-   int width;
-   int height;
+   private static int w;
+   private static int h;
+   static{
+       //groundSprite=new BufferedImage(new File(""))
+   }
+   private int width;
+   private int height;
    
    Color color;
 
@@ -37,10 +43,16 @@ public class Terrain extends StaticCollidable
        g.setColor(color); 
        g.setStroke(new BasicStroke(5));
        g.fillRect(Math.round(x),Math.round(y),width,height);
+       
+//       for(int i=0;i<(width/w);++i)
+//       {
+//       g.drawImage(groundSprite, Math.round(x)+i*w,Math.round(y)
+//                  ,groundSprite.getWidth(),groundSprite.getHeight(),null);
+//       }
    }
    Terrain()
    {
-       this(0,0,10,10,Color.GRAY);
+       this(0,0,10,10,Color.GREEN);
    }
    Terrain(int X, int Y, int Width, int Height)
    {

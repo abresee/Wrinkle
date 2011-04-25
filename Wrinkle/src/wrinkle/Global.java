@@ -15,7 +15,15 @@ import java.awt.image.BufferedImage;
  * Class contains constants and functions that other classes might find handy
  * @author a.bresee
  */
-public class Global{
+enum ActorType
+{
+    Bird,
+    Dragon,
+    Wrinkle,
+    Chameleon
+}
+public class Global
+{
     static final int timeStep=20;
     static final int WinX=800;
     static final int WinY=600;
@@ -25,11 +33,17 @@ public class Global{
     static final float[] coeff={0.125f,0.25f,0.5f};
     static float OffsetX=0;
     static float OffsetY=0;
-
+    static boolean menu=true;
+    static boolean inWindow(int x, int y)
+    {
+        float X=x-OffsetX;
+        float Y=y-OffsetY;
+        return (X > 0) && (X < WinX) && (Y > 0) && (Y < WinY);
+    }
 
     static Clip makeClip (String str) throws Exception
     {
-        try
+       try
         {
 
             Clip clip;
@@ -48,7 +62,6 @@ public class Global{
     }
     static BufferedImage convert(BufferedImage in)
     {
-
         BufferedImage temp=new BufferedImage(in.getWidth(),in.getHeight(),
         BufferedImage.TYPE_INT_ARGB);
         temp.getGraphics().drawImage(in, 0, 0, null);

@@ -15,6 +15,7 @@ import java.io.File;
  */
 public final class Fire extends ActiveCollidable{
 
+    Actor parent;
     private double angle;
     private static BufferedImage FireSprite;
     //private float scaleFactor;
@@ -23,9 +24,10 @@ public final class Fire extends ActiveCollidable{
    
    
 
-    Fire(float X, float Y, float mag, float angle_)
+    Fire(Actor p,float X, float Y, float mag, float angle_)
     {
         super(X, Y, (float)(mag*Math.cos(angle_)), (float)(mag*Math.sin(angle_)), 0.0f, 0.0f);
+        parent=p;
         angle=angle_;
 
         initImages();
@@ -57,7 +59,7 @@ public final class Fire extends ActiveCollidable{
     }
 
     @Override
-    void update(GameObjects go) throws DeadException
+    void update(GameObjects go) 
     {
        // e.println("fire x: "+x+"\nfire y: "+y);
         super.update(go);
@@ -87,15 +89,23 @@ public final class Fire extends ActiveCollidable{
         super.draw(g);
         g.setTransform(at);
     }
-
+    @Override
+    void handleWrinkleCollisionX(Wrinkle w)
+    {
+        handleActorCollisionX(w);
+    }
+    
     void handleTerrainCollisionX(Terrain i)
     {
-    die();
-    }
-    void handleActorCollisionX(Actor i) throws DeadException
-    {
-        i.hurt();
         die();
+    }
+    void handleActorCollisionX(Actor i) 
+    {
+        if(i!=parent)
+        {
+            i.hurt();
+            die();
+        }
     }
     void handleTerrainCollisionY(Terrain i){}
     void handleActorCollisionY(Actor i){}

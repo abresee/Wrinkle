@@ -1,2 +1,0 @@
-wrinkle.Pan
-wrinkle.Main

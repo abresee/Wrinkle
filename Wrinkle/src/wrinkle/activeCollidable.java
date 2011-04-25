@@ -36,7 +36,7 @@ abstract class ActiveCollidable extends Collidable {
     /**
      *Currently unused - mass for calculating momentum changes in collisions
      */
-    protected float mass;
+    //protected float mass;
 
     /**
      *How many game-frames should go by before the next animation frame is loaded
@@ -120,11 +120,11 @@ abstract class ActiveCollidable extends Collidable {
    @Override
     public Rectangle2D getbBox(){return collideShape;}
 
-    void die() throws DeadException
+    void die()
     {
         dead=true;
     }
-    boolean isDead()
+    public boolean isDead()
     {
         return dead;
     }
@@ -135,21 +135,18 @@ abstract class ActiveCollidable extends Collidable {
         boolean b=collideShape.intersects(c.getbBox());
         return b;
     }
-     void update(GameObjects go) throws DeadException
+     void update(GameObjects go)
     {
 
         updateVel();
         float dely = velY * Global.timeStep;
-        try{
+        
         tryMoveY(dely,go);
         
         float delx = velX * Global.timeStep;
         tryMoveX(delx,go);
-        }
-        catch (DeadException e)
-        {
-            throw e;
-        }
+        
+        
        
 
         updateState();
@@ -160,7 +157,7 @@ abstract class ActiveCollidable extends Collidable {
 
     }
 
-void tryMoveX(float delx, GameObjects go) throws DeadException
+void tryMoveX(float delx, GameObjects go)
     {
          x+=delx;
 
@@ -190,10 +187,26 @@ void tryMoveX(float delx, GameObjects go) throws DeadException
                  handleActorCollisionX(i);
              }
          }
+         try{
+         if(!this.equals(go.getWrinkle())&&collidesWith(go.getWrinkle()))
+         {
+             handleWrinkleCollisionX(go.getWrinkle());
+         }
+        }
+         catch(NoWrinkleException e)
+         {
+             e.printStackTrace();
+         }
     }
+    void handleWrinkleCollisionX(Wrinkle w)
+    {
 
+    }
+    void handleWrinkleCollisionY(Wrinkle w)
+    {
 
- void tryMoveY(float delY, GameObjects go) throws DeadException
+    }
+ void tryMoveY(float delY, GameObjects go)
     {
          boolean bk = false;
          y+=delY;
@@ -232,9 +245,9 @@ void tryMoveX(float delx, GameObjects go) throws DeadException
     }
 
      abstract void handleTerrainCollisionX(Terrain i);
-     abstract void handleActorCollisionX(Actor i) throws DeadException;
+     abstract void handleActorCollisionX(Actor i);
      abstract void handleTerrainCollisionY(Terrain i);
-     abstract void handleActorCollisionY(Actor i) throws DeadException;
+     abstract void handleActorCollisionY(Actor i);
      abstract void updateVel();
      abstract void updateState();
      abstract void updateAnim();

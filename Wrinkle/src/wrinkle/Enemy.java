@@ -14,9 +14,8 @@ import java.awt.image.ShortLookupTable;
  */
 abstract public class Enemy extends Actor{
 
-    
+    Wrinkle wrinkle;
     protected boolean active=false;
-    protected Wrinkle wrinkle;
     protected boolean vulnerable=false;
     private final int waittime=100;
     static LookupOp luo;
@@ -43,16 +42,16 @@ abstract public class Enemy extends Actor{
         luo=new LookupOp(l, null);
     }
 
-    Enemy(Wrinkle wrinkle_, String str, int X, int Y)
+    Enemy(Wrinkle w,String str, int X, int Y)
     {
         super(str, X, Y);
-        wrinkle=wrinkle_;
+        wrinkle=w;
         state=State.sleeping;
     }
 
     
     @Override
-    void update(GameObjects go) throws DeadException
+    void update(GameObjects go)
     {
         if(Math.abs(x-wrinkle.getX())<300||recovering)
         {
@@ -74,10 +73,9 @@ abstract public class Enemy extends Actor{
         if(vulnerable)
         {
             vulncount++;
-
         }
     }
-    void bitten() throws DeadException
+    void bitten() 
     {
 
         if(vulnerable)
@@ -111,6 +109,18 @@ abstract public class Enemy extends Actor{
         {
             super.draw(g);
         }
+    }
+    void handleWrinkleCollisionX(Wrinkle w)
+    {
+        if(w.isBiting())
+        {
+            bitten();
+        }
+        
+    }
+    void handleWrinkleCollisionY(Wrinkle w)
+    {
+
     }
     boolean isPlayer(){return false;}
     boolean isEnemy(){return true;}
