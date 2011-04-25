@@ -52,6 +52,10 @@ public final class Dragon extends Enemy{
         {
             state=State.sleeping;
         }
+        else if(fhelp.isBreathingFire())
+        {
+            state=State.action;
+        }
         else
         {
             super.updateState();
@@ -79,6 +83,7 @@ public final class Dragon extends Enemy{
         {
             fhelp.fireOff();
         }
+        fireTimer=0;
     }
     protected void activeScript()
     {
@@ -86,7 +91,7 @@ public final class Dragon extends Enemy{
         velX=(float)(.1*((cond)?1:-1));
         facingLeft=!cond;
         fhelp.setLoc(new Point(Math.round(wrinkle.x-Global.OffsetX),Math.round(wrinkle.y-Global.OffsetY)));
-        if(fireTimer<75)
+        if(50<fireTimer && fireTimer<75)
         {
             if(!fhelp.isBreathingFire())
             {

@@ -16,7 +16,7 @@ import java.awt.Graphics2D;
  * @author a.bresee
  */
 
-enum JobMode{normal,bird,dragon};
+enum JobMode{normal,bird,dragon,chameleon};
 
 public final class Wrinkle extends Actor {
 
@@ -182,16 +182,25 @@ public final class Wrinkle extends Actor {
             Global.OffsetX = x - Global.WinX / 4;
         }
         
-        if (y - Global.OffsetY < (Global.WinY*7/13))
+        if (y - Global.OffsetY < (Global.WinY*.4))
         {
-            Global.OffsetY = y - Global.WinY / 2;
+            Global.OffsetY = y - Global.WinY*.4f;
         } 
         
         else if ((y - Global.OffsetY +
                 curSprite.getHeight())
-                > Global.WinY - 50)
+                > Global.WinY - 250)
         {
-            Global.OffsetY = (y + curSprite.getHeight()) - (Global.WinY - 50);
+            Global.OffsetY = (y + curSprite.getHeight()) - (Global.WinY - 250);
+        }
+
+        if(Global.OffsetY > 0)
+        {
+            Global.OffsetY=0;
+        }
+        if(Global.OffsetX < 0)
+        {
+            Global.OffsetX=0;
         }
     }
     

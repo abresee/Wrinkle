@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.awt.Graphics2D;
 import javax.imageio.ImageIO;
 import java.io.File;
-
 /**
  * Class representing the actual game simulation itself. 
  * @author a.bresee
@@ -70,12 +69,28 @@ public class Level {
         buffg.setBackground(Color.cyan);
 
 
+        gameObjects.add(new Terrain(-50,-5000,50,5000+Global.WinY));
+        gameObjects.add(new DieBox(0, Global.WinY+300, 100*Global.WinX, Global.WinY));
 
-        gameObjects.addGround(0,Global.GroundLevel,20);
-        gameObjects.add(new DieBox(0, Global.WinY, 5*Global.WinX, Global.WinY));
-        gameObjects.add(new LogPlatform(800, 300));
-        gameObjects.add(new LogPlatform(973, 300));
-        gameObjects.add(new SpawnActor(1250,Global.GroundLevel,ActorType.Bird,gameObjects));
+        gameObjects.addGround(0,Global.GroundLevel,3);
+        gameObjects.addGround(800,Global.GroundLevel,3);
+        gameObjects.addLogs(1000,300,2);
+        gameObjects.addGround(1600, Global.GroundLevel, 8);
+        gameObjects.add(new SpawnActor(2050,Global.GroundLevel,ActorType.Bird,gameObjects));
+        gameObjects.addGround(4200,Global.GroundLevel,17);
+        gameObjects.add(new SpawnActor(5200,Global.GroundLevel,ActorType.Dragon,gameObjects));
+        gameObjects.addLogs(5500,300,2);
+        gameObjects.addGround(7600,Global.GroundLevel,6);
+        gameObjects.addLogs(7900,300,3);
+        gameObjects.add(new SpawnActor(8700,100,ActorType.Dragon,gameObjects));
+        gameObjects.addLogs(9000,300,2);
+        gameObjects.addLogs(10000,300,3);
+        gameObjects.addLogs(11000,300,2);
+        gameObjects.addGround(11500,300,6);
+        gameObjects.add(new Terrain(12700,0,200,Global.WinY,new Color(99,44,27)));
+        gameObjects.addGround(12700,-100);
+
+        
         gameObjects.add(ActorType.Wrinkle,Global.WinX / 4 + 1, Global.WinY - 200);
 
         try{
@@ -149,24 +164,20 @@ public class Level {
                         Global.WinX,Global.WinY);
 
         for (int i = 0; i < backgrounds.length; ++i) {
-            float x = -(Global.coeff[i] * Global.OffsetX) % Global.WinX;
-            float y = -(Global.coeff[i] * Global.OffsetY);
+            float x = (Global.coeff[i] * Global.OffsetX) % Global.WinX;
+            float y = (Global.coeff[i] * Global.OffsetY)+1000;
 
 
-            if (x >= 0) {
-                x -= Global.WinX;
+            if (x < 0) {
+                x += Global.WinX;
             }
-            at.setToTranslation(x, y);
-            buffg.setTransform(at);
-            buffg.drawImage(backgrounds[i], 0, 0, null);
+            buffg.drawImage(backgrounds[i],0,0,Global.WinX, Global.WinY,
+                    Math.round(x),Math.round(y),
+                    Math.round(x+Global.WinX),Math.round(y+Global.WinY), null);
         }
-        at.setToIdentity();
-        buffg.setTransform(at);
-
     }
 
     void drawForeground() {
-        //buffg.clearRect(0, 0, Global.WinX, Global.WinY);
         at.setToTranslation(-Global.OffsetX, -Global.OffsetY);
         buffg.setTransform(at);
 
@@ -224,7 +235,7 @@ public class Level {
             }
             --lives;
             try{
-            gameObjects.reset();
+            wrinkle=gameObjects.reset();
             wrinkle=gameObjects.getWrinkle();
             }
             catch(NoWrinkleException e)

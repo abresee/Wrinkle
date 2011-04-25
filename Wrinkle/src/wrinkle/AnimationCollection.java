@@ -96,7 +96,6 @@ public class AnimationCollection{
                bi=(facingLeft)
                  ?leftWalk.get((walkFrame++)%leftWalk.size())
                  :rightWalk.get((walkFrame++)%rightWalk.size());
-
                break;
            case jumping:
                bi=(facingLeft)?leftJump:rightJump;

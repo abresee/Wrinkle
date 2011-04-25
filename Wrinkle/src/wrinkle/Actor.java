@@ -28,6 +28,7 @@ public abstract class Actor extends ActiveCollidable {
     protected State state;
     protected int health;
     protected boolean recovering;
+    protected boolean flip=false;
     protected int recoverCount;
     /**set to false if sound initialization doesn't complete*/
     private boolean soundImplemented;
@@ -184,7 +185,19 @@ public abstract class Actor extends ActiveCollidable {
         }
     }
 
-    void updateSound() {
+    void updateSound()
+    {
+        if(frame++%frameTime==0)
+        {
+            if(onTheGround && velX!=0)
+            {
+                if(flip)
+                getSfx().walk1();
+                else
+                    getSfx().walk2();
+                flip=!flip;
+            }
+        }
     }
 
     void updateVel() {

@@ -50,7 +50,7 @@ class GameObjects
         dieboxes=new ArrayList<DieBox>();
         spawns=new ArrayList<SpawnActor>();
     }
-    void reset() throws NoWrinkleException
+    Wrinkle reset() throws NoWrinkleException
     {
         for(Actor i:actors)
         {
@@ -59,10 +59,12 @@ class GameObjects
         actors=new ArrayList<Actor>();
         Global.OffsetX=offX;
         Global.OffsetY=offY;
+        wrinkle=(Wrinkle)getActor(wrinklePattern);
         for(SpawnActor i:spawns)
         {
             i.spawn();
         }
+        return wrinkle;
     }
     
     public void add(SpawnActor a)
@@ -101,7 +103,6 @@ class GameObjects
                 {
                     throw new NoWrinkleException();
                 }
-                System.out.println("new bird");
                 return new Bird(wrinkle,a.x,a.y);
             case Dragon:
                 if(wrinkle==null)
@@ -127,6 +128,17 @@ class GameObjects
         for(int i=0;i<Times;++i)
         {
             terrains.add(new Ground(x+Math.round(i*Ground.sWidth()),y));
+        }
+    }
+    void addLogs(int x, int y)
+    {
+        this.addLogs(x,y,1);
+    }
+    void addLogs(int x, int y, int Times)
+    {
+        for(int i=0;i<Times;++i)
+        {
+            terrains.add(new LogPlatform(x+Math.round(i*LogPlatform.sWidth()),y));
         }
     }
     void add(Terrain t)
@@ -187,7 +199,6 @@ class GameObjects
         }
         
         actors=newActors;
-        System.out.println(actors.size());
     }
     Wrinkle getWrinkle() throws NoWrinkleException
     {

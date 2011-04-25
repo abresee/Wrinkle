@@ -16,6 +16,14 @@ import java.io.File;
 public class LogPlatform extends Terrain
 {
     static BufferedImage sprite;
+    static float sWidth()
+    {
+        return sprite.getWidth();
+    }
+    static float sHeight()
+    {
+        return sprite.getHeight();
+    }
     static
     {
         try

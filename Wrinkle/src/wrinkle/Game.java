@@ -23,6 +23,7 @@ public class Game extends Pan
 
     Game()
     {
+
         setIgnoreRepaint(true);
         this.addKeyListener(this);
         setFocusable(true);
@@ -118,7 +119,7 @@ public class Game extends Pan
                         
             paintImmediately(0,0,Global.WinX,Global.WinY);
             time = System.currentTimeMillis() - time;
-           // System.out.println(time);
+            System.out.println(time);
             if (time < Global.timeStep)
 
             {

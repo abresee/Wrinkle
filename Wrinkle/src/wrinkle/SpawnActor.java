@@ -33,6 +33,5 @@ public class SpawnActor
     void spawn()
     {
         act=go.add(a, x, y);
-        System.out.println("spawn");
     }
 }
